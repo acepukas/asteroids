@@ -1,6 +1,6 @@
 /*global define:true */
 
-define(['app/stage','app/motionelement','app/shape','app/ship','app/humanControlled'],
+define(['app/stage','app/motionelement','app/shape','app/ship','app/humancontrolled'],
 function(Stage,MotionElement,Shape,Ship,HumanControlled) {
 
     return {
