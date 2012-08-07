@@ -1,0 +1,40 @@
+* {
+    margin:0;
+    padding:0;
+}
+
+body {
+    font-family:monospace;
+    font-size:62.5%;
+    background:#111111;
+}
+
+p {
+    font-size:2.5em;
+    color:white;
+}
+
+#main {
+    margin:0 auto;
+    width:1000px;
+}
+
+canvas {
+    background:#000;
+    border:1px solid #000;
+}
+
+#infoPanel {
+    border:1px solid #333;
+    background:#222;
+    padding:20px;
+    line-height:30px;
+}
+
+.msgtrue {
+    color:#00ff00;
+}
+
+.msgfalse {
+    color:#ff0000;
+}
