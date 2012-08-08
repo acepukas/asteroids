@@ -5,7 +5,7 @@ function(Stage,MotionElement,Shape,Ship,HumanControlled) {
 
     return {
         start : function(){
-            var stage = new Stage(1000,'/gfx/tile3.jpg',function(stage) {
+            var stage = new Stage(1000,'./gfx/tile3.jpg',function(stage) {
                 var me = new HumanControlled({
                     motionElement : new MotionElement({
                         'stage':stage,
