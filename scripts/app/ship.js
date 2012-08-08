@@ -3,9 +3,7 @@
 define(['my.class','app/shape','app/util'],
 function(my,Shape,util) {
 
-    var imgData = null,
-        bbox = null,
-        Ship = my.Class(Shape,{
+    var Ship = my.Class(Shape,{
 
         constructor : function(scale) {
             if(!(this instanceof Ship)) {
