@@ -59,22 +59,19 @@ function(my,util){
 
         return {
 
-            constructor : function(width,background,initCallback) {
+            constructor : function(width) {
                 if(!(this instanceof Stage)) {
-                    return new Stage(width,background,initCallback);
+                    return new Stage(width);
                 }
                 
                 // capture this as that
                 that = this;
                 that.width = width;
-                that.background = background;
-                that.initCallback = initCallback;
 
             },
 
             init: function() {
                 ctx = that.setUpCanvas();
-                that.setBackground(that.background,that.initCallback);
                 that.initAnim();
             },
 
@@ -88,28 +85,6 @@ function(my,util){
                     }
                 },0);
 
-            },
-
-            setBackground: function(imgPath,callback){
-                var img = document.createElement('img');
-
-                img.onload = function() {
-                    var curX = bounds.x1,
-                        curY = bounds.y1,
-                        width = img.width,
-                        height = img.height;
-
-                    while(curY < bounds.y2) {
-                        while(curX < bounds.x2) {
-                            ctx.drawImage(img,curX,curY,width,height);
-                            curX += width;
-                        }
-                        curX = bounds.x1;
-                        curY += height;
-                    }
-                    callback(that);
-                };
-                img.src = imgPath;
             },
 
             getCtx : function() {

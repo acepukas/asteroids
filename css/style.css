@@ -20,7 +20,7 @@ p {
 }
 
 canvas {
-    background:#000;
+    background:url(../gfx/tile3.jpg) repeat;
     border:1px solid #000;
 }
 
