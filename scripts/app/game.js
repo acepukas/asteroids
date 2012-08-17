@@ -17,6 +17,7 @@ function(Stage,MotionElement,Shape,Ship,HumanControlled) {
                 turningRate:8
             });
             stage.addMotionElement(me);
+            stage.initAnim();
         }
     };
 

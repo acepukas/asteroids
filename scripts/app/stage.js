@@ -34,6 +34,8 @@ function(my,util){
             // 60 frames per second
             // seems that to register as 60, + 10 is needed
             framerate = Math.round(1000/70),
+
+            gamespeed = Math.round(1000/50),
             
             // DOM node for information output
             infoPanel = document.getElementById('infoPanel');
@@ -72,18 +74,25 @@ function(my,util){
 
             init: function() {
                 ctx = that.setUpCanvas();
-                that.initAnim();
             },
 
             initAnim : function() {
                 
-                time = +new Date();
-                setInterval(function() {
-                    if((+new Date())-time > framerate) {
-                        that.update();
-                        time = +new Date();
-                    }
-                },0);
+                var initTimingLoop = function(timing,callback) {
+                    var time = +new Date();
+                    return function() {
+                        if((+new Date())-time > timing) {
+                            callback(time);
+                            time = +new Date();
+                        }
+                    };
+                };
+
+                var renderLoop = initTimingLoop(framerate,that.render);
+                var gameLoop = initTimingLoop(gamespeed,that.update);
+
+                setInterval(renderLoop,0);
+                setInterval(gameLoop,0);
 
             },
 
@@ -93,6 +102,10 @@ function(my,util){
 
             getTime : function() {
                 return time;
+            },
+
+            setTime : function (time_arg) {
+                time = time_arg;
             },
 
             getBounds : function() {
@@ -109,15 +122,27 @@ function(my,util){
 
             update : function() {
                 // that.clear();
-                that.updateMotionElements();
+                that.positionMotionElements();
+            },
+
+            render : function(time) {
+                that.setTime(time);
+                that.renderMotionElements();
                 that.updateInfoPanel();
             },
 
-            updateMotionElements : function() {
+            positionMotionElements : function() {
                 var i = motionElements.length;
                 while(i--) {
                     motionElements[i].update();
                     that.correctPosition(motionElements[i]);
+                }
+            },
+
+            renderMotionElements : function() {
+                var i = motionElements.length;
+                while(i--) {
+                    motionElements[i].render();
                 }
             },
 

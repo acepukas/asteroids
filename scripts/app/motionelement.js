@@ -36,7 +36,6 @@ function(my,Point,Vector,util){
 
         update : function() {
             this.updatePosition();
-            this.draw();
         },
 
         updatePosition : function() {
@@ -87,7 +86,7 @@ function(my,Point,Vector,util){
             return this.stage;
         },
 
-        draw : function() {
+        render : function() {
 
             this.getShape().draw({
                 ctx:this.stage.getCtx(),

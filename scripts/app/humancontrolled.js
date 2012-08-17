@@ -30,10 +30,13 @@ function(my,Vector,util){
             this.getMotionElement().updatePosition();
         },
 
+        render : function() {
+            this.getMotionElement().render();
+        },
+
         update : function() {
             this.keyEvents();
             this.updatePosition();
-            this.getMotionElement().draw();
         },
 
         keyEvents : function() {
