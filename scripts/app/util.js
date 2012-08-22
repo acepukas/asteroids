@@ -186,6 +186,10 @@ define(function(){
             var shDtType = this.type(params.shapeData),
                 funcs = {'array':this.plotPoints,'string':this.plotText};
             return funcs[shDtType].call(this,params);
+        },
+
+        addPoints : function(p1,p2) {
+            return {x:p1.x+p2.x,y:p1.y+p2.y};
         }
 
     };

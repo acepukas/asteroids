@@ -19,22 +19,26 @@ function(my,Point,Vector,util){
             }
 
             this.stage = config.stage;
-
             this.shape = config.shape;
+            this.behavior = (config.behavior) ? config.behavior : null;
 
-            this.position = new Point(
-                this.stage.getBounds().x2/2,
-                this.stage.getBounds().y2/2
-            );
+            this.position = {
+                x:this.stage.getBounds().x2/2,
+                y:this.stage.getBounds().y2/2
+            };
 
             this.dir = 0;
 
             this.heading = new Vector();
             this.mass = config.mass || 2000;
-            this.maxSpeed = config.mxspd || 12;
+            this.maxSpeed = config.maxSpeed || 12;
+
         },
 
         update : function() {
+            if(this.behavior) {
+                this.behavior.update(); 
+            }
             this.updatePosition();
         },
 
@@ -66,8 +70,16 @@ function(my,Point,Vector,util){
             return this.heading;
         },
 
+        setHeading : function(heading) {
+             this.heading = heading;
+        },
+
         getPosition : function() {
             return this.position;
+        },
+
+        setPosition : function(pos) {
+            this.position = pos;
         },
 
         getShape : function() {
@@ -80,6 +92,18 @@ function(my,Point,Vector,util){
 
         setDirection : function(dir) {
             this.dir = dir;
+        },
+
+        getDirection : function() {
+            return this.dir;
+        },
+
+        getBehavior : function() {
+            return this.behavior;
+        },
+        
+        setBehavior : function(behavior) {
+            this.behavior = behavior;
         },
 
         getStage : function() {

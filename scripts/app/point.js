@@ -10,8 +10,10 @@ function(my){
                 return new Point(x,y);
             }
 
-            this.x = x || 0;
-            this.y = y || 0;
+            var point = (x.x) ? x : {x:x,y:y};
+
+            this.x = point.x || 0;
+            this.y = point.y || 0;
         },
 
         toString : function(){

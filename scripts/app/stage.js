@@ -12,7 +12,8 @@ function(my,util){
                 right:false,
                 left:false,
                 up:false,
-                down:false
+                down:false,
+                space:false
             },
 
             // stores stage oundries in 
@@ -33,7 +34,7 @@ function(my,util){
 
             // 60 frames per second
             // seems that to register as 60, + 10 is needed
-            framerate = Math.round(1000/70),
+            framerate = Math.round(1000/72),
 
             gamespeed = Math.round(1000/50),
             
@@ -47,6 +48,7 @@ function(my,util){
             if(e.keyCode===39) { keys.right=true; }
             if(e.keyCode===38) { keys.up=true; }
             if(e.keyCode===40) { keys.down=true; }
+            if(e.keyCode===32) { keys.space=true; }
 
         }, false);
 
@@ -56,6 +58,7 @@ function(my,util){
             if(e.keyCode===39) { keys.right=false; }
             if(e.keyCode===38) { keys.up=false; }
             if(e.keyCode===40) { keys.down=false; }
+            if(e.keyCode===32) { keys.space=false; }
 
         }, false);
 
@@ -127,6 +130,7 @@ function(my,util){
 
             render : function(time) {
                 that.setTime(time);
+                that.clear();
                 that.renderMotionElements();
                 that.updateInfoPanel();
             },
@@ -175,21 +179,35 @@ function(my,util){
             },
 
             correctPosition : function(mo) { // motionElement as arg
-                var p = mo.getPosition();
-                if(p.x > bounds.x2) { p.x = bounds.x1; }
-                if(p.y > bounds.y2) { p.y = bounds.y1; }
-                if(p.x < bounds.x1) { p.x = bounds.x2; }
-                if(p.y < bounds.y1) { p.y = bounds.y2; }
+                if(mo) {
+                    var p = mo.getPosition();
+                    if(p.x > bounds.x2) { p.x = bounds.x1; }
+                    if(p.y > bounds.y2) { p.y = bounds.y1; }
+                    if(p.x < bounds.x1) { p.x = bounds.x2; }
+                    if(p.y < bounds.y1) { p.y = bounds.y2; }
+                }
             },
 
             addMotionElement : function(mo) {
                 motionElements.push(mo);
             },
 
+            removeMotionElement : function(mo) {
+                var i = motionElements.length;
+
+                while(i--) {
+                    if(motionElements[i] === mo) {
+                        motionElements.splice(1,i); 
+                    }
+                }
+                
+            },
+
             updateInfoPanel : function() {
-                var fps = util.round(1000/(+new Date()-time),0),
-                    out = '<p>'+motionElements[0]+'</p>';
-                    out += '<p>fps :     ' + fps + '</p>';
+                // var fps = util.round(1000/(+new Date()-time),0),
+                //     out = '<p>'+motionElements[0]+'</p>';
+                //     out += '<p>fps :     ' + fps + '</p>';
+                var out = '';
                 infoPanel.innerHTML = out;
             }
         };

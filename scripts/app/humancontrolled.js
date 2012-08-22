@@ -11,10 +11,16 @@ function(my,Vector,util){
             }
 
             this.motionElement = config.motionElement;
-            this.stage = this.motionElement.getStage();
+            this.stage = config.stage,
+            this.turnrate = (!!config.turnrate) ?
+                util.tr(config.turnrate) :
+                util.tr(8);
+            this.mef = config.motionElementFactory;
+
             this.engine = new Vector();
+            this.readyToFire = true;
+            this.firingRate = 1000/6;
             this.thrust = 0.3;
-            this.turnrate = (!!config.turnrate) ? util.tr(config.turnrate) : util.tr(8);
 
         },
 
@@ -26,27 +32,33 @@ function(my,Vector,util){
             this.motionElement = motionElement;
         },
 
-        updatePosition : function() {
-            this.getMotionElement().updatePosition();
-        },
-
-        render : function() {
-            this.getMotionElement().render();
-        },
-
         update : function() {
             this.keyEvents();
-            this.updatePosition();
         },
 
         keyEvents : function() {
-            this.updateSpeed(this.stage.getKeys().up);
-            if(this.stage.getKeys().up) {
+
+            var keys = this.stage.getKeys();
+
+            this.updateSpeed(keys.up);
+
+            if(keys.up) {
                 this.getMotionElement().getHeading().combine(this.engine);
             }
-            if(this.stage.getKeys().left) { this.setDirection(-this.turnrate); }
-            if(this.stage.getKeys().right) { this.setDirection(this.turnrate); }
+
+            if(keys.left) {
+                this.setDirection(-this.turnrate); 
+            }
+
+            if(keys.right) {
+                this.setDirection(this.turnrate); 
+            }
+
             this.getMotionElement().setDirection(this.getDirection());
+
+            if(keys.space) {
+                this.fireProjectile(); 
+            }
         },
 
         updateSpeed : function (thrustEngaged) {
@@ -57,6 +69,19 @@ function(my,Vector,util){
             var d = this.engine.dir + step;
             if(Math.abs(d) > Math.PI) { d = -(d - (d % Math.PI)); }
             this.engine.dir = d;
+        },
+
+        fireProjectile : function  () {
+            var that = this;
+            if(that.readyToFire) {
+                that.readyToFire = false;
+                var source = this.getMotionElement();
+                var me = that.mef.createElement('projectile',[source]);
+                that.stage.addMotionElement(me);
+                setTimeout(function() {
+                    that.readyToFire = true;   
+                },that.firingRate);
+            }
         },
 
         getDirection : function() {

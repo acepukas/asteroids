@@ -1,35 +1,37 @@
-/*global define:true, my:true  */
-
+/*global define:true, my.true */
 define(['my.class','app/shape','app/util'],
 function(my,Shape,util) {
-
-    var Ship = my.Class(Shape,{
+    
+    var Projectile = my.Class(Shape,{
 
         constructor : function(scale) {
-            if(!(this instanceof Ship)) {
-                return new Ship(scale);
+            if(!(this instanceof Projectile)) {
+                return new Projectile(scale);
             }
 
             var points = [
-                {x:-20, y:  0}, // tail
-                {x:-10, y: 15},
-                {x: -2, y: 15},
-                {x: 40, y:  0}, // nose
-                {x: -2, y:-15},
-                {x:-10, y:-15}
+                {x: 0, y:-6},
+                {x: 4, y:-4},
+                {x: 6, y: 0},
+                {x: 4, y: 4},
+                {x: 0, y: 6},
+                {x:-4, y: 4},
+                {x:-6, y: 0},
+                {x:-4, y:-4}
             ];
-            
-            Ship.Super.call(this,scale,points);
+
+            Projectile.Super.call(this,scale,points);
+
         },
 
-        draw : function(params){
+        draw : function  (params) {
             var ctx = params.ctx;
 
             ctx.save();
             // this.restoreBackground(params);
-            ctx.fillStyle="#666666";
-            ctx.strokeStyle="#111";
-            ctx.lineWidth = 3.0;
+            ctx.fillStyle="#996666";
+            ctx.strokeStyle="#611";
+            ctx.lineWidth = 2.0;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
             ctx.beginPath();
@@ -44,6 +46,6 @@ function(my,Shape,util) {
 
     });
 
-    return Ship;
+    return Projectile;
 
 });
