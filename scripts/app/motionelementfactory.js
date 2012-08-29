@@ -14,19 +14,19 @@ function(my,MotionElement,Ship,HumanControlled,Projectile,ProjectileBehavior) {
 
         },
 
-        createElement : function (elementName,args) {
-
-            var element = null;
-            switch (elementName) {
-                case 'ship':
-                    element = this.createShip.apply(this,args);
-                    break;
-                case 'projectile':
-                    element = this.createProjectile.apply(this,args);
-                    break;
+        createElement : function (elConf) {
+            var elType = elConf.type || 'null';
+            var createMethod = 'create'+this.cap(elType);
+            if(this[createMethod]){
+                return this[createMethod](elConf.config);
             }
+            return null;
+        },
 
-            return element;
+        cap : function(subject) {
+            return subject.replace(/^([a-z])(.*)$/,function(orig,first,rest){
+                return first.toUpperCase() + rest;
+            });
         },
 
         createShip : function () {
@@ -39,7 +39,6 @@ function(my,MotionElement,Ship,HumanControlled,Projectile,ProjectileBehavior) {
             });
 
             me.setBehavior(new HumanControlled({
-                stage:this.stage,
                 motionElementFactory:this,
                 turningRate:8,
                 motionElement:me
@@ -49,20 +48,20 @@ function(my,MotionElement,Ship,HumanControlled,Projectile,ProjectileBehavior) {
 
         },
 
-        createProjectile : function(source) {
+        createProjectile : function(config) {
 
             var me = new MotionElement({
-                shape:new Projectile(1),
                 stage:this.stage,
+                shape:new Projectile(1.3),
                 maxSpeed:100,
                 mass:600
             });
 
             me.setBehavior(new ProjectileBehavior({
-                stage:this.stage,
-                startSpeed:10,
+                startSpeed:15,
                 motionElement:me,
-                source:source
+                initDistance:90,
+                source:(config.source || null)
             }));
 
             return me;

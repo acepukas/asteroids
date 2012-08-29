@@ -1,4 +1,4 @@
-/*global define:true, my.true */
+/*global define:true, my:true */
 define(['my.class','app/shape','app/util'],
 function(my,Shape,util) {
     
@@ -18,30 +18,48 @@ function(my,Shape,util) {
                 {x:-4, y: 4},
                 {x:-6, y: 0},
                 {x:-4, y:-4}
-            ];
+            ],
 
-            Projectile.Super.call(this,scale,points);
+            states = {
+                'default':{
+                    'points':points,
+                    'scale':scale*1.3,
+                    'drawStyles':{
+                        'lineWidth':3.0,
+                        'lineCap':'round',
+                        'lineJoin':'round',
+                        'strokeStyle':'#d71',
+                        'fillStyle':'#c60'
+                    }
+                },
+                'alternate':{
+                    'points':points,
+                    'scale':scale,
+                    'drawStyles':{
+                        'lineWidth':2.0,
+                        'lineCap':'round',
+                        'lineJoin':'round',
+                        'strokeStyle':'#a33',
+                        'fillStyle':'#922'
+                    }
+                }
+            };
+
+            this.time = +new Date();
+            this.state = 'default';
+
+            Projectile.Super.call(this,states);
 
         },
 
-        draw : function  (params) {
-            var ctx = params.ctx;
+        draw : function(params) {
+            if((+new Date()) - this.time > 100) {
+                this.time = (+new Date());
+                this.state = (this.state === 'default') ? 'alternate' : 'default';
+            }
 
-            ctx.save();
-            // this.restoreBackground(params);
-            ctx.fillStyle="#996666";
-            ctx.strokeStyle="#611";
-            ctx.lineWidth = 2.0;
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
-            ctx.beginPath();
-            this.plotShapeData(params);
-            ctx.closePath();
-            // this.saveBackground(params);
-            ctx.fill();
-            ctx.stroke();
-            // this.drawBoundingBox(params);
-            ctx.restore();
+            params.state = this.state;
+            Projectile.Super.prototype.draw.call(this,params);
         }
 
     });

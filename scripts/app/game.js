@@ -8,7 +8,10 @@ function(Stage,MotionElementFactory) {
             var stage = new Stage(1000);
             stage.init();
             var mef = new MotionElementFactory({'stage':stage});
-            stage.addMotionElement(mef.createElement('ship'));
+            var me = mef.createElement({
+                type:'ship'
+            });
+            stage.addMotionElement(me);
             stage.initAnim();
         }
     };

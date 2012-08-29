@@ -190,6 +190,15 @@ define(function(){
 
         addPoints : function(p1,p2) {
             return {x:p1.x+p2.x,y:p1.y+p2.y};
+        },
+
+        foreach : function(object,callback) {
+            var key = null;
+            for(key in object) {
+                if(object.hasOwnProperty(key)) {
+                    callback(key,object[key]);
+                }
+            } 
         }
 
     };

@@ -204,10 +204,10 @@ function(my,util){
             },
 
             updateInfoPanel : function() {
-                // var fps = util.round(1000/(+new Date()-time),0),
-                //     out = '<p>'+motionElements[0]+'</p>';
-                //     out += '<p>fps :     ' + fps + '</p>';
-                var out = '';
+                var fps = util.round(1000/(+new Date()-time),0),
+                    out = '<p>'+motionElements[0]+'</p>';
+                    out += '<p>fps :     ' + fps + '</p>';
+                // var out = '';
                 infoPanel.innerHTML = out;
             }
         };

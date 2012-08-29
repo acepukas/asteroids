@@ -22,10 +22,10 @@ function(my,Point,Vector,util){
             this.shape = config.shape;
             this.behavior = (config.behavior) ? config.behavior : null;
 
-            this.position = {
-                x:this.stage.getBounds().x2/2,
-                y:this.stage.getBounds().y2/2
-            };
+            this.position = new Point(
+                this.stage.getBounds().x2/2,
+                this.stage.getBounds().y2/2
+            );
 
             this.dir = 0;
 
@@ -37,7 +37,7 @@ function(my,Point,Vector,util){
 
         update : function() {
             if(this.behavior) {
-                this.behavior.update(); 
+                this.behavior.update(this.stage); 
             }
             this.updatePosition();
         },

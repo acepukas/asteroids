@@ -5,74 +5,42 @@ function(my,util){
 
     var Shape = my.Class({
 
-        constructor : function(scale,shapeData) {
+        constructor : function(states) {
             if(!(this instanceof Shape)) {
-                return new Shape(scale,shapeData);
+                return new Shape(states);
             }
 
-            this.scale = scale;
-            this.shapeData = shapeData;
+            this.states = states;
+
             this.bbox = null;
-            this.imgData = null;
-        },
-
-        getBbox : function() {
-            return this.bbox;
-        },
-        
-        setBbox : function(bbox) {
-            this.bbox = bbox;
-        },
-
-        getShapeData : function() {
-            return this.shapeData;
-        },
-        
-        setShapeData : function(shapeData) {
-            this.shapeData = shapeData;
-        },
-
-        getScale : function() {
-            return this.scale;
-        },
-        
-        setScale : function(scale) {
-            this.scale = scale;
         },
 
         draw : function(params) {
-            var ctx = params.ctx,
-                pos = params.position;
+            var state = params.state || 'default';
+            state = this.states[state];
+            var ctx = params.ctx;
+
+            params.scale = state.scale;
+            params.shapeData = state.points;
+
             ctx.save();
-            ctx.fillStyle="#FFF";
-            ctx.translate(pos.x,pos.y);
-            ctx.fillText("Shape: basic shape object.",0,0);
+            this.setDrawStyle(ctx,state.drawStyles);
+            ctx.beginPath();
+            this.plotShapeData(params);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
             ctx.restore();
         },
 
+        setDrawStyle : function(ctx,styles) {
+            util.foreach(styles,function(key,val) {
+                ctx[key] = val;
+            })
+        },
+
         plotShapeData : function(params) {
-            params.scale = this.scale;
-            params.shapeData = this.shapeData;
             this.bbox = util.plotShapeData(params);
-        },
-
-        saveBackground : function(params) {
-            this.imgData = params.ctx.getImageData(
-                this.bbox.blitZone.x,
-                this.bbox.blitZone.y,
-                this.bbox.blitZone.w,
-                this.bbox.blitZone.h
-            );
-        },
-
-        restoreBackground : function(params) {
-            if(this.bbox !== null) {
-                params.ctx.putImageData(
-                    this.imgData,
-                    this.bbox.blitZone.x,
-                    this.bbox.blitZone.y
-                );
-            }
         },
 
         drawBoundingBox : function(params) {

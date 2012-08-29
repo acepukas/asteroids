@@ -10,12 +10,12 @@ function(my,Vector,Point,util) {
                 return new ProjectileBehavior(config);
             }
 
-            if(config.stage) {
-                this.stage = config.stage;
-            }
-
             if(config.source) {
                 this.source = config.source;
+            }
+
+            if(config.initDistance) {
+                this.initDistance = config.initDistance;
             }
 
             if(config.startSpeed) {
@@ -40,17 +40,18 @@ function(my,Vector,Point,util) {
         },
 
         initialize : function() {
+            var initDistance = this.initDistance;
             var dir = this.source.getDirection();
             var heading = new Vector(this.startSpeed,dir).combine(this.source.getHeading());
             this.motionElement.setHeading(heading);
-            var startVector = new Vector(90,dir);
+            var startVector = new Vector(initDistance,dir);
             pos = new Point(util.addPoints(startVector.getPoint(),this.source.getPosition()));
             this.motionElement.setPosition(pos);
         },
 
-        update : function() {
-            if((+(new Date()) - this.birthTime) > 600) {
-                this.stage.removeMotionElement(this.getMotionElement());
+        update : function(stage) {
+            if((+(new Date()) - this.birthTime) > 700) {
+                stage.removeMotionElement(this.getMotionElement());
             }
         }
 

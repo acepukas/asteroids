@@ -11,7 +11,6 @@ function(my,Vector,util){
             }
 
             this.motionElement = config.motionElement;
-            this.stage = config.stage,
             this.turnrate = (!!config.turnrate) ?
                 util.tr(config.turnrate) :
                 util.tr(8);
@@ -32,13 +31,13 @@ function(my,Vector,util){
             this.motionElement = motionElement;
         },
 
-        update : function() {
-            this.keyEvents();
+        update : function(stage) {
+            this.keyEvents(stage);
         },
 
-        keyEvents : function() {
+        keyEvents : function(stage) {
 
-            var keys = this.stage.getKeys();
+            var keys = stage.getKeys();
 
             this.updateSpeed(keys.up);
 
@@ -57,7 +56,7 @@ function(my,Vector,util){
             this.getMotionElement().setDirection(this.getDirection());
 
             if(keys.space) {
-                this.fireProjectile(); 
+                this.fireProjectile(stage); 
             }
         },
 
@@ -71,13 +70,17 @@ function(my,Vector,util){
             this.engine.dir = d;
         },
 
-        fireProjectile : function  () {
+        fireProjectile : function  (stage) {
             var that = this;
             if(that.readyToFire) {
                 that.readyToFire = false;
-                var source = this.getMotionElement();
-                var me = that.mef.createElement('projectile',[source]);
-                that.stage.addMotionElement(me);
+                var me = that.mef.createElement({
+                    type:'projectile',
+                    config:{
+                        source:this.getMotionElement()
+                    }
+                });
+                stage.addMotionElement(me);
                 setTimeout(function() {
                     that.readyToFire = true;   
                 },that.firingRate);
