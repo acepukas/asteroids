@@ -1,7 +1,7 @@
 /*global define:true, my:true */
 
-define(['my.class','app/util'],
-function(my,util){
+define(['underscore','my.class','app/util'],
+function(_,my,util){
 
     var Shape = my.Class({
 
@@ -34,7 +34,7 @@ function(my,util){
         },
 
         setDrawStyle : function(ctx,styles) {
-            util.foreach(styles,function(key,val) {
+            _.each(styles,function(val,key) {
                 ctx[key] = val;
             })
         },

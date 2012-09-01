@@ -9,16 +9,7 @@ function(my,Shape,util) {
                 return new Projectile(scale);
             }
 
-            var points = [
-                {x: 0, y:-6},
-                {x: 4, y:-4},
-                {x: 6, y: 0},
-                {x: 4, y: 4},
-                {x: 0, y: 6},
-                {x:-4, y: 4},
-                {x:-6, y: 0},
-                {x:-4, y:-4}
-            ],
+            var points = util.generateCircPoints(16,3);
 
             states = {
                 'default':{

@@ -1,7 +1,7 @@
 /*global define:true, my:true */
 
-define(['my.class','app/util'],
-function(my,util){
+define(['my.class','jquery','app/util'],
+function(my,$,util){
 
     var Stage = my.Class((function () {
 
@@ -14,6 +14,14 @@ function(my,util){
                 up:false,
                 down:false,
                 space:false
+            },
+
+            keymap = {
+                k37:'left',
+                k39:'right',
+                k38:'up',
+                k40:'down',
+                k32:'space'
             },
 
             // stores stage oundries in 
@@ -42,25 +50,17 @@ function(my,util){
             infoPanel = document.getElementById('infoPanel');
             
         // set up key event listeners
-        document.addEventListener('keydown',function(e) {
-
-            if(e.keyCode===37) { keys.left=true; }
-            if(e.keyCode===39) { keys.right=true; }
-            if(e.keyCode===38) { keys.up=true; }
-            if(e.keyCode===40) { keys.down=true; }
-            if(e.keyCode===32) { keys.space=true; }
-
-        }, false);
-
-        document.addEventListener('keyup',function(e) {
-
-            if(e.keyCode===37) { keys.left=false; }
-            if(e.keyCode===39) { keys.right=false; }
-            if(e.keyCode===38) { keys.up=false; }
-            if(e.keyCode===40) { keys.down=false; }
-            if(e.keyCode===32) { keys.space=false; }
-
-        }, false);
+        $(document).keydown(function(e) {
+            try {
+                keys[keymap['k'+e.which]]=true;
+            } catch(e) {}
+        });
+        
+        $(document).keyup(function(e) {
+            try {
+                keys[keymap['k'+e.which]]=false;
+            } catch(e) {}
+        });
 
         return {
 
@@ -80,19 +80,9 @@ function(my,util){
             },
 
             initAnim : function() {
-                
-                var initTimingLoop = function(timing,callback) {
-                    var time = +new Date();
-                    return function() {
-                        if((+new Date())-time > timing) {
-                            callback(time);
-                            time = +new Date();
-                        }
-                    };
-                };
 
-                var renderLoop = initTimingLoop(framerate,that.render);
-                var gameLoop = initTimingLoop(gamespeed,that.update);
+                var renderLoop = util.initTimingLoop(framerate,that.render);
+                var gameLoop = util.initTimingLoop(gamespeed,that.update);
 
                 setInterval(renderLoop,0);
                 setInterval(gameLoop,0);

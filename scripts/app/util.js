@@ -104,6 +104,17 @@ define(function(){
             return {'x':this.toCartesianX(vec.mag,vec.dir),'y':this.toCartesianY(vec.mag,vec.dir)};
         },
 
+        generateCircPoints : function (numOfPoints,mag) {
+            var points = [];
+            var dirStep = 360 / numOfPoints;
+            
+            for(var a = 0; a < 360; a+= dirStep) {
+                points.push(this.toCartesian({dir:this.tr(a),mag:mag}));
+            }
+
+            return points;
+        },
+
         scale : function(point,scale){
             point.x *= scale;
             point.y *= scale;
@@ -192,13 +203,15 @@ define(function(){
             return {x:p1.x+p2.x,y:p1.y+p2.y};
         },
 
-        foreach : function(object,callback) {
-            var key = null;
-            for(key in object) {
-                if(object.hasOwnProperty(key)) {
-                    callback(key,object[key]);
+
+        initTimingLoop : function(timing,callback) {
+            var time = +new Date();
+            return function() {
+                if((+new Date())-time > timing) {
+                    callback(time);
+                    time = +new Date();
                 }
-            } 
+            };
         }
 
     };
