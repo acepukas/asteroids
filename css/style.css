@@ -9,11 +9,6 @@ body {
     background:#111111;
 }
 
-p {
-    font-size:2.5em;
-    color:white;
-}
-
 #main {
     margin:0 auto;
     width:1000px;
@@ -29,6 +24,19 @@ canvas {
     background:#222;
     padding:20px;
     line-height:30px;
+}
+
+#infoPanel ul {
+    list-style-type:none;
+}
+
+#infoPanel ul li {
+    font-size:2.5em;
+    color:white;
+}
+
+#infoPanel ul li span {
+    font-weight: bold;
 }
 
 .msgtrue {

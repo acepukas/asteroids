@@ -212,6 +212,12 @@ define(function(){
                     time = +new Date();
                 }
             };
+        },
+
+        cleanTemplate : function(selector) {
+            return $.trim($(selector).html()).
+                replace(/\n/mg,'').
+                replace(/\s{2,}/g,'');
         }
 
     };

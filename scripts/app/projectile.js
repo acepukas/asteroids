@@ -1,6 +1,6 @@
 /*global define:true, my:true */
-define(['my.class','app/shape','app/util'],
-function(my,Shape,util) {
+define(['my.class','underscore','app/shape','app/util'],
+function(my,_,Shape,util) {
     
     var Projectile = my.Class(Shape,{
 
@@ -36,21 +36,27 @@ function(my,Shape,util) {
                 }
             };
 
-            this.time = +new Date();
             this.state = 'default';
+            this.stateKeys = _.keys(states);
+            this.statePointer = 0;
+
+            var that = this;
+            var loop = util.initTimingLoop(100,function(time){
+                that.state = that.nextState();
+            });
+
+            setInterval(loop,0);
 
             Projectile.Super.call(this,states);
 
         },
 
-        draw : function(params) {
-            if((+new Date()) - this.time > 100) {
-                this.time = (+new Date());
-                this.state = (this.state === 'default') ? 'alternate' : 'default';
+        nextState : function() {
+            if(this.statePointer >= this.stateKeys.length) {
+                this.statePointer = 0;
             }
 
-            params.state = this.state;
-            Projectile.Super.prototype.draw.call(this,params);
+            return this.stateKeys[this.statePointer++];
         }
 
     });

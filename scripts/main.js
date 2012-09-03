@@ -5,11 +5,15 @@ requirejs.config({
     paths : {
         app : '../app',
         jquery : 'jquery-1.8.1.min',
-        underscore : 'underscore-min'
+        underscore : 'underscore-min',
+        handlebars : 'handlebars-1.0.0.beta.6'
     },
     shim : {
         underscore : {
             exports : '_' 
+        },
+        handlebars : {
+            exports : 'Handlebars' 
         }
     }
 });

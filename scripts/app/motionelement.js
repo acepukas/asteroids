@@ -20,6 +20,9 @@ function(my,Point,Vector,util){
 
             this.stage = config.stage;
             this.shape = config.shape;
+
+            this.setName(''+this.shape);
+
             this.behavior = (config.behavior) ? config.behavior : null;
 
             this.position = new Point(
@@ -110,6 +113,13 @@ function(my,Point,Vector,util){
             return this.stage;
         },
 
+        getName : function() {
+            return this.name;
+        },
+        
+        setName : function(name) {
+            this.name = name;
+        },
         render : function() {
 
             this.getShape().draw({
@@ -118,14 +128,6 @@ function(my,Point,Vector,util){
                 dir:this.dir
             });
 
-        },
-
-        toString : function() {
-            var o = [];
-            o.push('motionElement info:');
-            o.push('position: ' + this.position);
-            o.push('heading:  ' + this.heading);
-            return o.join('<br />');
         }
 
     });

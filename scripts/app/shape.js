@@ -16,7 +16,7 @@ function(_,my,util){
         },
 
         draw : function(params) {
-            var state = params.state || 'default';
+            var state = this.state || 'default';
             state = this.states[state];
             var ctx = params.ctx;
 
@@ -53,6 +53,12 @@ function(_,my,util){
                 this.bbox.bounds.w,
                 this.bbox.bounds.h
             );
+        },
+
+        toString : function() {
+            return (''+this.constructor).
+                replace(/(\n|\r)/g,'').
+                replace(/^.*instanceof ([a-zA-Z]*).*$/,'$1');
         }
 
     });

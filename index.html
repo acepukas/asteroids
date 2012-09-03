@@ -16,5 +16,11 @@
 
         <script data-main="./scripts/main.js" src="./scripts/lib/require.js" type="text/javascript" charset="utf-8"></script>
 
+        <script id="info-panel-template" type="text/x-handlebars-template" charset="utf-8">
+            <ul>
+                {{#each infoItems}}<li><span>{{this.label}}:</span> {{this.value}}</li>{{/each}}
+            </ul>
+        </script>
+
     </body>
 </html>

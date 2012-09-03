@@ -1,7 +1,7 @@
 /*global define:true, my:true */
 
-define(['my.class','jquery','app/util'],
-function(my,$,util){
+define(['my.class','jquery','handlebars','app/util'],
+function(my,$,Handlebars,util){
 
     var Stage = my.Class((function () {
 
@@ -45,9 +45,15 @@ function(my,$,util){
             framerate = Math.round(1000/72),
 
             gamespeed = Math.round(1000/50),
+
+            // info obj for output
+            consoleData = {infoItems:[]},
+            
+            // output template
+            infoPanelTemplate = Handlebars.compile(util.cleanTemplate('#info-panel-template')),
             
             // DOM node for information output
-            infoPanel = document.getElementById('infoPanel');
+            infoPanel = $('#infoPanel');
             
         // set up key event listeners
         $(document).keydown(function(e) {
@@ -114,7 +120,6 @@ function(my,$,util){
             },
 
             update : function() {
-                // that.clear();
                 that.positionMotionElements();
             },
 
@@ -193,12 +198,19 @@ function(my,$,util){
                 
             },
 
+            getFps : function() {
+                return util.round(1000/(+new Date()-time),0);
+            },
+
             updateInfoPanel : function() {
-                var fps = util.round(1000/(+new Date()-time),0),
-                    out = '<p>'+motionElements[0]+'</p>';
-                    out += '<p>fps :     ' + fps + '</p>';
-                // var out = '';
-                infoPanel.innerHTML = out;
+                consoleData.infoItems = [];
+                var mo = motionElements[0];
+                var el = mo.getName();
+                
+                consoleData.infoItems.push({label:el + ' Position',value:mo.getPosition()});
+                consoleData.infoItems.push({label:el + ' Heading',value:mo.getHeading()});
+                consoleData.infoItems.push({label:'fps',value:this.getFps()});
+                infoPanel.html(infoPanelTemplate(consoleData));
             }
         };
 
