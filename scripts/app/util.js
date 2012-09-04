@@ -1,5 +1,5 @@
 /*global define:true, my:true */
-define(function(){
+define(['jquery'],function($){
 
     var bboffset = 5;
 
@@ -105,10 +105,11 @@ define(function(){
         },
 
         generateCircPoints : function (numOfPoints,mag) {
-            var points = [];
-            var dirStep = 360 / numOfPoints;
+            var points = [],
+                dirStep = 360 / numOfPoints,
+                a = 0;
             
-            for(var a = 0; a < 360; a+= dirStep) {
+            for(a = 0; a < 360; a+= dirStep) {
                 points.push(this.toCartesian({dir:this.tr(a),mag:mag}));
             }
 
@@ -218,6 +219,63 @@ define(function(){
             return $.trim($(selector).html()).
                 replace(/\n/mg,'').
                 replace(/\s{2,}/g,'');
+        },
+
+        rgbComponents : function (hexColor) {
+            var c = {};
+            c.r = parseInt(hexColor.substr(0,2),16);
+            c.g = parseInt(hexColor.substr(2,2),16);
+            c.b = parseInt(hexColor.substr(4,2),16);
+            return c;
+        },
+
+        numSteps : function (num1,num2,steps) {
+
+            var num = -(num1 - num2),
+                step = num/steps,
+                degs = [num1],
+                curStep = 0,
+                i = 0;
+
+            for(i = 1; i < steps; i++) {
+                curStep += step;
+                degs.push(Math.round(num1 + curStep));
+            }
+            
+            degs.push(num2);
+
+            return degs;
+        },
+
+        numToHex2digit : function (num) {
+            var place = (num < 16) ? '0' : '';
+            return place + num.toString(16);
+        },
+
+        gradient : function (c1,c2,steps) {
+
+            c1 = this.rgbComponents(c1);
+            c2 = this.rgbComponents(c2);
+
+            var rSteps = this.numSteps(c1.r,c2.r,steps),
+                gSteps = this.numSteps(c1.g,c2.g,steps),
+                bSteps = this.numSteps(c1.b,c2.b,steps),
+
+                degs = [],
+
+                i = 0,
+
+                r,g,b;
+            
+            for(i = 0; i < rSteps.length; i++) {
+                r = this.numToHex2digit(rSteps[i]);
+                g = this.numToHex2digit(gSteps[i]);
+                b = this.numToHex2digit(bSteps[i]);
+                degs.push(r+g+b);
+            }
+            
+            return degs;
+            
         }
 
     };

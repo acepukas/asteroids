@@ -52,7 +52,7 @@ function(my,MotionElement,Ship,HumanControlled,Projectile,ProjectileBehavior) {
 
             var me = new MotionElement({
                 stage:this.stage,
-                shape:new Projectile(2),
+                shape:new Projectile(2.5),
                 maxSpeed:100,
                 mass:600
             });

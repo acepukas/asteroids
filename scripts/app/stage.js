@@ -146,7 +146,7 @@ function(my,$,Handlebars,util){
             },
 
             setUpCanvas : function() {
-                var canvas = document.getElementById('canvas'),
+                var canvas = $('canvas')[0],
                     wh = that.getCanvasSize(that.width);
                 
                 canvas.width = wh[0];

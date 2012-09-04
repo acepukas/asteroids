@@ -56,9 +56,12 @@ function(_,my,util){
         },
 
         toString : function() {
-            return (''+this.constructor).
-                replace(/(\n|\r)/g,'').
-                replace(/^.*instanceof ([a-zA-Z]*).*$/,'$1');
+            if(!arguments.callee.className) {
+                arguments.callee.className = (''+this.constructor).
+                    replace(/(\n|\r)/g,'').
+                    replace(/^.*instanceof ([a-zA-Z]*).*$/,'$1');
+            }
+            return arguments.callee.className;
         }
 
     });

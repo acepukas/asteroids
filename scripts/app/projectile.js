@@ -16,32 +16,71 @@ function(my,_,Shape,util) {
                     'points':points,
                     'scale':scale*1.3,
                     'drawStyles':{
-                        'lineWidth':3.0,
+                        'lineWidth':2.0,
                         'lineCap':'round',
                         'lineJoin':'round',
-                        'strokeStyle':'#d71',
-                        'fillStyle':'#c60'
+                        'strokeStyle':'#111'
                     }
                 },
-                'alternate':{
+                'state1':{
                     'points':points,
                     'scale':scale,
                     'drawStyles':{
                         'lineWidth':2.0,
                         'lineCap':'round',
                         'lineJoin':'round',
-                        'strokeStyle':'#a33',
-                        'fillStyle':'#922'
+                        'strokeStyle':'#111'
+                    }
+                },
+                'state2':{
+                    'points':points,
+                    'scale':scale,
+                    'drawStyles':{
+                        'lineWidth':2.0,
+                        'lineCap':'round',
+                        'lineJoin':'round',
+                        'strokeStyle':'#111'
+                    }
+                },
+                'state3':{
+                    'points':points,
+                    'scale':scale,
+                    'drawStyles':{
+                        'lineWidth':2.0,
+                        'lineCap':'round',
+                        'lineJoin':'round',
+                        'strokeStyle':'#111'
+                    }
+                },
+                'state4':{
+                    'points':points,
+                    'scale':scale,
+                    'drawStyles':{
+                        'lineWidth':2.0,
+                        'lineCap':'round',
+                        'lineJoin':'round',
+                        'strokeStyle':'#111'
                     }
                 }
             };
+
+            var grad = util.gradient('006699','ff6666',4);
+
+            var key = null;
+            var i = 0;
+            for(key in states) {
+                if(states.hasOwnProperty(key)) {
+                    states[key].drawStyles.fillStyle = '#'+grad[i];
+                    i++;
+                }
+            }
 
             this.state = 'default';
             this.stateKeys = _.keys(states);
             this.statePointer = 0;
 
             var that = this;
-            var loop = util.initTimingLoop(100,function(time){
+            var loop = util.initTimingLoop(50,function(time){
                 that.state = that.nextState();
             });
 
