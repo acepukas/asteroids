@@ -8,53 +8,50 @@
  *
  */
 
-define(['my.class','app/point','app/vector','app/util'],
-function(my,Point,Vector,util){
+define(['underscore','my.class','app/point','app/vector','app/util'],
+function(_,my,Point,Vector,util){
+
+    var config = {};
 
     var MotionElement = my.Class({
 
-        constructor : function(config) {
+        constructor : function(conf) {
             if(!(this instanceof MotionElement)) {
-                return new MotionElement(config);
+                return new MotionElement(conf);
             }
 
-            this.stage = config.stage;
-            this.shape = config.shape;
+            config = _.extend(config,conf);
+            var stage = config.gameElement.getStage();
 
-            this.setName(''+this.shape);
-
-            this.behavior = (config.behavior) ? config.behavior : null;
-
-            this.position = new Point(
-                this.stage.getBounds().x2/2,
-                this.stage.getBounds().y2/2
+            config.position = new Point(
+                stage.getBounds().x2/2,
+                stage.getBounds().y2/2
             );
 
-            this.dir = 0;
+            config.dir = 0;
 
-            this.heading = new Vector();
-            this.mass = config.mass || 2000;
-            this.maxSpeed = config.maxSpeed || 12;
+            config.heading = new Vector();
+
+            config.mass = conf.mass || 2000;
+            config.maxSpeed = conf.maxSpeed || 12;
+            config.friction = config.gameElement.getStage().getFriction();
 
         },
 
         update : function() {
-            if(this.behavior) {
-                this.behavior.update(this.stage); 
-            }
             this.updatePosition();
         },
 
         updatePosition : function() {
-            this.heading = this.calcFinalVelocity(this.heading,-this.stage.getFriction());
-            this.heading.mag = this.restrictVelocity(this.heading.mag);
-            this.position = this.heading.combineCartesian(this.position);
+            config.heading = this.calcFinalVelocity(config.heading,-config.friction);
+            config.heading.mag = this.restrictVelocity(config.heading.mag);
+            config.position = config.heading.combineCartesian(config.position);
         },
 
         restrictVelocity : function(v) {
             // restrict velocity
             var minSpeed = 0.1;
-            v = (v >= this.maxSpeed) ? this.maxSpeed : v;
+            v = (v >= config.maxSpeed) ? config.maxSpeed : v;
             v = (v <= minSpeed) ? minSpeed : v;
             return v;
         },
@@ -62,72 +59,39 @@ function(my,Point,Vector,util){
         calcFinalVelocity : function(vector, force) {
             
             var vel = 0,
-                t = this.stage.getTime(),
-                accel = util.getAcceleration(force,this.mass,t);
+                t = config.gameElement.getStage().getTime(),
+                accel = util.getAcceleration(force,config.mass,t);
 
             vector.mag += util.getVelocity(vel,accel,t);
             return vector;
         },
 
         getHeading : function() {
-            return this.heading;
+            return config.heading;
         },
 
         setHeading : function(heading) {
-             this.heading = heading;
+             config.heading = heading;
         },
 
         getPosition : function() {
-            return this.position;
+            return config.position;
         },
 
         setPosition : function(pos) {
-            this.position = pos;
-        },
-
-        getShape : function() {
-            return this.shape;
-        },
-        
-        setShape : function(shape) {
-            this.shape = shape;
+            config.position = pos;
         },
 
         setDirection : function(dir) {
-            this.dir = dir;
+            config.dir = dir;
         },
 
         getDirection : function() {
-            return this.dir;
-        },
-
-        getBehavior : function() {
-            return this.behavior;
-        },
-        
-        setBehavior : function(behavior) {
-            this.behavior = behavior;
+            return config.dir;
         },
 
         getStage : function() {
-            return this.stage;
-        },
-
-        getName : function() {
-            return this.name;
-        },
-        
-        setName : function(name) {
-            this.name = name;
-        },
-        render : function() {
-
-            this.getShape().draw({
-                ctx:this.stage.getCtx(),
-                position:this.position,
-                dir:this.dir
-            });
-
+            return config.stage;
         }
 
     });

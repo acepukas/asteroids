@@ -1,14 +1,18 @@
 /*global define:true, my:true  */
 
-define(['my.class','app/shape','app/util'],
-function(my,Shape,util) {
+define(['underscore','my.class','app/shape','app/util'],
+function(_,my,Shape,util) {
+
+    var config = {};
 
     var Ship = my.Class(Shape,{
 
-        constructor : function(scale) {
+        constructor : function(conf) {
             if(!(this instanceof Ship)) {
-                return new Ship(scale);
+                return new Ship(conf);
             }
+
+            config = _.extend(config,conf);
 
             var states = {
                 'default':{
@@ -20,7 +24,7 @@ function(my,Shape,util) {
                         {x: -2, y:-15},
                         {x:-10, y:-15}
                     ],
-                    'scale':scale,
+                    'scale':config.scale,
                     'drawStyles':{
                         'lineWidth':3.0,
                         'lineCap':'round',
@@ -31,7 +35,10 @@ function(my,Shape,util) {
                 }
             };
             
-            Ship.Super.call(this,states);
+            Ship.Super.call(this,{
+                'states':states,
+                gameElement:config.gameElement
+            });
         }
 
     });

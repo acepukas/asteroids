@@ -1,34 +1,32 @@
 /*global define:true, my:true */
 
-define(['my.class','app/vector','app/util'],
-function(my,Vector,util){
+define(['underscore','my.class','app/vector','app/util'],
+function(_,my,Vector,util){
+
+    var config = {};
 
     var HumanControlled = my.Class({
 
-        constructor : function(config) {
+        constructor : function(conf) {
             if(!(this instanceof HumanControlled)) {
-                return new HumanControlled(config);
+                return new HumanControlled(conf);
             }
 
-            this.motionElement = config.motionElement;
-            this.turnrate = (!!config.turnrate) ?
-                util.tr(config.turnrate) :
-                util.tr(8);
-            this.mef = config.motionElementFactory;
+            config = _.extend(config,conf);
 
-            this.engine = new Vector();
-            this.readyToFire = true;
-            this.firingRate = 1000/6;
-            this.thrust = 0.3;
+            config.turnrate = (!!conf.turnrate) ?
+                util.tr(conf.turnrate) :
+                util.tr(8);
+
+            config.engine = new Vector();
+            config.readyToFire = true;
+            config.firingRate = 1000/6;
+            config.thrust = 0.3;
 
         },
 
         getMotionElement : function() {
-            return this.motionElement;
-        },
-        
-        setMotionElement : function(motionElement) {
-            this.motionElement = motionElement;
+            return config.gameElement.getMotionElement();
         },
 
         update : function(stage) {
@@ -37,37 +35,37 @@ function(my,Vector,util){
 
         keyEvents : function(stage) {
 
-            var keys = stage.getKeys();
+            var keys = config.gameElement.getStage().getKeys();
 
             this.updateSpeed(keys.up);
 
             if(keys.up) {
-                this.getMotionElement().getHeading().combine(this.engine);
+                this.getMotionElement().getHeading().combine(config.engine);
             }
 
             if(keys.left) {
-                this.setDirection(-this.turnrate); 
+                this.setDirection(-config.turnrate); 
             }
 
             if(keys.right) {
-                this.setDirection(this.turnrate); 
+                this.setDirection(config.turnrate); 
             }
 
             this.getMotionElement().setDirection(this.getDirection());
 
             if(keys.space) {
-                this.fireProjectile(stage); 
+                // this.fireProjectile(stage); 
             }
         },
 
         updateSpeed : function (thrustEngaged) {
-            this.engine.mag = (thrustEngaged) ? this.thrust : 0;
+            config.engine.mag = (thrustEngaged) ? config.thrust : 0;
         },
 
         setDirection : function(step) {
-            var d = this.engine.dir + step;
+            var d = config.engine.dir + step;
             if(Math.abs(d) > Math.PI) { d = -(d - (d % Math.PI)); }
-            this.engine.dir = d;
+            config.engine.dir = d;
         },
 
         fireProjectile : function  (stage) {
@@ -77,7 +75,7 @@ function(my,Vector,util){
                 var me = that.mef.createElement({
                     type:'projectile',
                     config:{
-                        source:this.getMotionElement()
+                        source:that.getMotionElement()
                     }
                 });
                 stage.addMotionElement(me);
@@ -88,7 +86,7 @@ function(my,Vector,util){
         },
 
         getDirection : function() {
-            return this.engine.dir;
+            return config.engine.dir;
         },
 
         getPosition : function() {
@@ -99,8 +97,8 @@ function(my,Vector,util){
             var out = this.getMotionElement().toString(),
                 o = [];
                 out += '<br />';
-            o.push('thrust:   ' + util.round(this.engine.mag,5));
-            o.push('engine:   ' + this.engine);
+            o.push('thrust:   ' + util.round(config.engine.mag,5));
+            o.push('engine:   ' + config.engine);
             out += o.join('<br />');
             return out;
         }

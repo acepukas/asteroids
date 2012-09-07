@@ -38,7 +38,7 @@ function(my,$,Handlebars,util){
             ctx = null,
 
             // stores a list of motion objects
-            motionElements = [],
+            gameElements = [],
 
             // 60 frames per second
             // seems that to register as 60, + 10 is needed
@@ -131,17 +131,17 @@ function(my,$,Handlebars,util){
             },
 
             positionMotionElements : function() {
-                var i = motionElements.length;
+                var i = gameElements.length;
                 while(i--) {
-                    motionElements[i].update();
-                    that.correctPosition(motionElements[i]);
+                    gameElements[i].update();
+                    that.correctPosition(gameElements[i]);
                 }
             },
 
             renderMotionElements : function() {
-                var i = motionElements.length;
+                var i = gameElements.length;
                 while(i--) {
-                    motionElements[i].render();
+                    gameElements[i].render();
                 }
             },
 
@@ -159,9 +159,7 @@ function(my,$,Handlebars,util){
                 bounds.y2 = canvas.height;
 
                 that.clear = function() {
-                    ctx.save();
                     ctx.clearRect(bounds.x1,bounds.y1,bounds.x2,bounds.y2);
-                    ctx.restore();
                 };
 
                 return ctx;
@@ -173,9 +171,9 @@ function(my,$,Handlebars,util){
                 return [w,h];
             },
 
-            correctPosition : function(mo) { // motionElement as arg
-                if(mo) {
-                    var p = mo.getPosition();
+            correctPosition : function(ge) { // getionElement as arg
+                if(ge) {
+                    var p = ge.getMotionElement().getPosition();
                     if(p.x > bounds.x2) { p.x = bounds.x1; }
                     if(p.y > bounds.y2) { p.y = bounds.y1; }
                     if(p.x < bounds.x1) { p.x = bounds.x2; }
@@ -183,16 +181,16 @@ function(my,$,Handlebars,util){
                 }
             },
 
-            addMotionElement : function(mo) {
-                motionElements.push(mo);
+            addGameElement : function(ge) {
+                gameElements.push(ge);
             },
 
-            removeMotionElement : function(mo) {
-                var i = motionElements.length;
+            regeveGameElement : function(ge) {
+                var i = gameElements.length;
 
                 while(i--) {
-                    if(motionElements[i] === mo) {
-                        motionElements.splice(1,i); 
+                    if(gameElements[i] === ge) {
+                        gameElements.splice(1,i); 
                     }
                 }
                 
@@ -204,8 +202,9 @@ function(my,$,Handlebars,util){
 
             updateInfoPanel : function() {
                 consoleData.infoItems = [];
-                var mo = motionElements[0];
-                var el = mo.getName();
+                var main = gameElements[0];
+                var mo = main.getMotionElement();
+                var el = main.getName();
                 
                 consoleData.infoItems.push({label:el + ' Position',value:mo.getPosition()});
                 consoleData.infoItems.push({label:el + ' Heading',value:mo.getHeading()});

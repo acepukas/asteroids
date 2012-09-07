@@ -133,24 +133,27 @@ define(['jquery'],function($){
         },
 
         plotPoints : function(params) {
-            var l = params.shapeData.length,
+            var ps = params.points,
+                l = ps.length,
                 i = l,
                 tp = null,
                 x1=Infinity,
                 y1=Infinity,
                 x2=-Infinity,
                 y2=-Infinity,
-                bboffset = 5;
+                dir = params.dir,
+                pos = params.pos,
+                scale = params.scale;
 
             while(i--) {
-                tp = params.shapeData[i];
-                tp = this.rotate(tp,params.dir);
-                this.scale(tp,params.scale);
-                this.translate(tp,params.position);
+                tp = ps[i];
+                tp = this.rotate(tp,dir);
+                this.scale(tp,scale);
+                this.translate(tp,pos);
                 if(i===l) {
-                    params.ctx.moveTo(tp.x,tp.y);
+                    params.callback(tp,'moveTo');
                 } else {
-                    params.ctx.lineTo(tp.x,tp.y);
+                    params.callback(tp,'lineTo');
                 }
                 if(tp.x<x1) {x1 = tp.x;}
                 if(tp.y<y1) {y1 = tp.y;}
@@ -163,11 +166,10 @@ define(['jquery'],function($){
         },
 
         plotText : function(params){
-            var ctx = params.ctx,
-                pos = params.position,
+            var ctx = params.stage.getCtx(),
+                pos = params.motionElement.getPosition(),
                 textMetrics = null,
                 height = 48,
-                bboffset = 5,
                 x1 = 0,
                 y1 = 0,
                 x2 = 0,
@@ -195,7 +197,8 @@ define(['jquery'],function($){
         },
 
         plotShapeData : function(params) {
-            var shDtType = this.type(params.shapeData),
+            var p = params.points,
+                shDtType = this.type(p),
                 funcs = {'array':this.plotPoints,'string':this.plotText};
             return funcs[shDtType].call(this,params);
         },
@@ -276,6 +279,12 @@ define(['jquery'],function($){
             
             return degs;
             
+        },
+
+        cap : function(subject) {
+            return subject.replace(/^([a-z])(.*)$/,function(orig,first,rest){
+                return first.toUpperCase() + rest;
+            });
         }
 
     };

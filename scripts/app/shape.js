@@ -3,48 +3,56 @@
 define(['underscore','my.class','app/util'],
 function(_,my,util){
 
+    var config = {
+        state:'default'
+    };
+
     var Shape = my.Class({
 
-        constructor : function(states) {
+        constructor : function(conf) {
             if(!(this instanceof Shape)) {
-                return new Shape(states);
+                return new Shape(conf);
             }
 
-            this.states = states;
-
+            config = _.extend(conf,config);
             this.bbox = null;
         },
 
-        draw : function(params) {
-            var state = this.state || 'default';
-            state = this.states[state];
-            var ctx = params.ctx;
+        draw : function() {
+            var state = config.states[config.state];
+            var stage = config.gameElement.getStage();
+            var mo = config.gameElement.getMotionElement();
 
-            params.scale = state.scale;
-            params.shapeData = state.points;
+            var ctx = stage.getCtx();
+
+            var params = {
+                scale: state.scale,
+                points: state.points,
+                dir : mo.getDirection(),
+                pos : mo.getPosition(),
+                callback : function(point,method){
+                    ctx[method](point.x,point.y);
+                }
+            };
 
             ctx.save();
-            this.setDrawStyle(ctx,state.drawStyles);
+            this.setDrawStyle(state.drawStyles,ctx);
             ctx.beginPath();
-            this.plotShapeData(params);
+            this.bbox = util.plotShapeData(params);
             ctx.closePath();
             ctx.fill();
             ctx.stroke();
             ctx.restore();
         },
 
-        setDrawStyle : function(ctx,styles) {
+        setDrawStyle : function(styles,ctx) {
             _.each(styles,function(val,key) {
-                ctx[key] = val;
+               ctx[key] = val;
             })
         },
 
-        plotShapeData : function(params) {
-            this.bbox = util.plotShapeData(params);
-        },
-
         drawBoundingBox : function(params) {
-            var ctx = params.ctx;
+            var ctx = params.stage.getCtx();
             ctx.lineWidth = 1;
             ctx.strokeStyle="#ffff00";
             ctx.strokeRect(
@@ -53,6 +61,14 @@ function(_,my,util){
                 this.bbox.bounds.w,
                 this.bbox.bounds.h
             );
+        },
+
+        getState : function() {
+            return config.state;
+        },
+        
+        setState : function(state) {
+            config.state = state;
         },
 
         toString : function() {
