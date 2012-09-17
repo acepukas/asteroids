@@ -1,6 +1,6 @@
 /*global define:true, my:true */
 
-define(['my.class'],
+define(['myclass'],
 function(my){
 
     var Point = my.Class({

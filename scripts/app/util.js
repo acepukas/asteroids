@@ -1,5 +1,5 @@
 /*global define:true, my:true */
-define(['jquery'],function($){
+define(['jquery','underscore'],function($,_){
 
     var bboffset = 5;
 
@@ -225,10 +225,10 @@ define(['jquery'],function($){
         },
 
         rgbComponents : function (hexColor) {
-            var c = {};
-            c.r = parseInt(hexColor.substr(0,2),16);
-            c.g = parseInt(hexColor.substr(2,2),16);
-            c.b = parseInt(hexColor.substr(4,2),16);
+            var c = [];
+            c.push(hexColor.substr(0,2));
+            c.push(hexColor.substr(2,2));
+            c.push(hexColor.substr(4,2));
             return c;
         },
 
@@ -257,24 +257,25 @@ define(['jquery'],function($){
 
         gradient : function (c1,c2,steps) {
 
+            var that = this,
+                toDecMap = function(item) { return parseInt(item,16); },
+                toHexMap = function(item) { return that.numToHex2digit(item); },
+                rSteps, gSteps, bSteps,
+                degs = [],
+                i = 0;
+
             c1 = this.rgbComponents(c1);
             c2 = this.rgbComponents(c2);
 
-            var rSteps = this.numSteps(c1.r,c2.r,steps),
-                gSteps = this.numSteps(c1.g,c2.g,steps),
-                bSteps = this.numSteps(c1.b,c2.b,steps),
+            c1 = _.map(c1,toDecMap);
+            c2 = _.map(c2,toDecMap);
 
-                degs = [],
+            rSteps = _.map(this.numSteps(c1[0],c2[0],steps),toHexMap);
+            gSteps = _.map(this.numSteps(c1[1],c2[1],steps),toHexMap);
+            bSteps = _.map(this.numSteps(c1[2],c2[2],steps),toHexMap);
 
-                i = 0,
-
-                r,g,b;
-            
             for(i = 0; i < rSteps.length; i++) {
-                r = this.numToHex2digit(rSteps[i]);
-                g = this.numToHex2digit(gSteps[i]);
-                b = this.numToHex2digit(bSteps[i]);
-                degs.push(r+g+b);
+                degs.push(rSteps[i]+gSteps[i]+bSteps[i]);
             }
             
             return degs;

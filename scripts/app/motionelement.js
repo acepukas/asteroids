@@ -8,10 +8,11 @@
  *
  */
 
-define(['underscore','my.class','app/point','app/vector','app/util'],
+define(['underscore','myclass','app/point','app/vector','app/util'],
 function(_,my,Point,Vector,util){
 
-    var config = {};
+    var prvt = {};
+    var stage = null;
 
     var MotionElement = my.Class({
 
@@ -20,22 +21,32 @@ function(_,my,Point,Vector,util){
                 return new MotionElement(conf);
             }
 
-            config = _.extend(config,conf);
-            var stage = config.gameElement.getStage();
+            _.each(conf,this.proxy(function(val,key) {
+                this[key] = val; 
+            }));
 
-            config.position = new Point(
+            stage = this.gameElement.get('stage');
+
+            this.position = new Point(
                 stage.getBounds().x2/2,
                 stage.getBounds().y2/2
             );
 
-            config.dir = 0;
+            this.direction = 0;
 
-            config.heading = new Vector();
+            this.heading = new Vector();
 
-            config.mass = conf.mass || 2000;
-            config.maxSpeed = conf.maxSpeed || 12;
-            config.friction = config.gameElement.getStage().getFriction();
+            this.mass = conf.mass || 2000;
+            this.maxSpeed = conf.maxSpeed || 12;
+            this.friction = stage.getFriction();
 
+        },
+
+        proxy : function(fn) {
+            var self = this;
+            return function () {
+                fn.apply(self,arguments);
+            }
         },
 
         update : function() {
@@ -43,15 +54,15 @@ function(_,my,Point,Vector,util){
         },
 
         updatePosition : function() {
-            config.heading = this.calcFinalVelocity(config.heading,-config.friction);
-            config.heading.mag = this.restrictVelocity(config.heading.mag);
-            config.position = config.heading.combineCartesian(config.position);
+            this.heading = this.calcFinalVelocity(this.heading,-this.friction);
+            this.heading.mag = this.restrictVelocity(this.heading.mag);
+            this.position = this.heading.combineCartesian(this.position);
         },
 
         restrictVelocity : function(v) {
             // restrict velocity
             var minSpeed = 0.1;
-            v = (v >= config.maxSpeed) ? config.maxSpeed : v;
+            v = (v >= this.maxSpeed) ? this.maxSpeed : v;
             v = (v <= minSpeed) ? minSpeed : v;
             return v;
         },
@@ -59,39 +70,11 @@ function(_,my,Point,Vector,util){
         calcFinalVelocity : function(vector, force) {
             
             var vel = 0,
-                t = config.gameElement.getStage().getTime(),
-                accel = util.getAcceleration(force,config.mass,t);
+                t = stage.getTime(),
+                accel = util.getAcceleration(force,this.mass,t);
 
             vector.mag += util.getVelocity(vel,accel,t);
             return vector;
-        },
-
-        getHeading : function() {
-            return config.heading;
-        },
-
-        setHeading : function(heading) {
-             config.heading = heading;
-        },
-
-        getPosition : function() {
-            return config.position;
-        },
-
-        setPosition : function(pos) {
-            config.position = pos;
-        },
-
-        setDirection : function(dir) {
-            config.dir = dir;
-        },
-
-        getDirection : function() {
-            return config.dir;
-        },
-
-        getStage : function() {
-            return config.stage;
         }
 
     });

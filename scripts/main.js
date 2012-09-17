@@ -6,7 +6,8 @@ requirejs.config({
         app : '../app',
         jquery : 'jquery-1.8.1.min',
         underscore : 'underscore-min',
-        handlebars : 'handlebars-1.0.0.beta.6'
+        handlebars : 'handlebars-1.0.0.beta.6',
+        myclass : 'my.class'
     },
     shim : {
         underscore : {
@@ -14,11 +15,14 @@ requirejs.config({
         },
         handlebars : {
             exports : 'Handlebars' 
+        },
+        myclass : {
+            exports : 'my' 
         }
     }
 });
 
 requirejs(['app/game'],
-function(game) {
-    game.start();
+function(app) {
+    app.start();
 });

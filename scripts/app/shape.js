@@ -1,12 +1,8 @@
 /*global define:true, my:true */
 
-define(['underscore','my.class','app/util'],
+define(['underscore','myclass','app/util'],
 function(_,my,util){
-
-    var config = {
-        state:'default'
-    };
-
+    
     var Shape = my.Class({
 
         constructor : function(conf) {
@@ -14,29 +10,31 @@ function(_,my,util){
                 return new Shape(conf);
             }
 
-            config = _.extend(conf,config);
+            _.extend(this,conf);
+            this.state = 'default';
             this.bbox = null;
         },
 
         draw : function() {
-            var state = config.states[config.state];
-            var stage = config.gameElement.getStage();
-            var mo = config.gameElement.getMotionElement();
+            var state = this.states[this.state],
+                stage = this.gameElement.get('stage'),
+                direction = this.gameElement.get('direction'),
+                position = this.gameElement.get('position'),
 
-            var ctx = stage.getCtx();
+                ctx = stage.getCtx(),
 
-            var params = {
-                scale: state.scale,
-                points: state.points,
-                dir : mo.getDirection(),
-                pos : mo.getPosition(),
-                callback : function(point,method){
-                    ctx[method](point.x,point.y);
-                }
-            };
+                params = {
+                    scale: state.scale,
+                    points: state.points,
+                    dir : direction,
+                    pos : position,
+                    callback : function(point,method){
+                        ctx[method](point.x,point.y);
+                    }
+                };
 
             ctx.save();
-            this.setDrawStyle(state.drawStyles,ctx);
+            this.drawStyles(state.drawStyles,ctx);
             ctx.beginPath();
             this.bbox = util.plotShapeData(params);
             ctx.closePath();
@@ -45,10 +43,10 @@ function(_,my,util){
             ctx.restore();
         },
 
-        setDrawStyle : function(styles,ctx) {
+        drawStyles : function(styles,ctx) {
             _.each(styles,function(val,key) {
                ctx[key] = val;
-            })
+            });
         },
 
         drawBoundingBox : function(params) {
@@ -63,21 +61,10 @@ function(_,my,util){
             );
         },
 
-        getState : function() {
-            return config.state;
-        },
-        
-        setState : function(state) {
-            config.state = state;
-        },
-
-        toString : function() {
-            if(!arguments.callee.className) {
-                arguments.callee.className = (''+this.constructor).
-                    replace(/(\n|\r)/g,'').
-                    replace(/^.*instanceof ([a-zA-Z]*).*$/,'$1');
-            }
-            return arguments.callee.className;
+        toString : function thisToString() {
+            return (this.constructor.toString()).
+                replace(/(\n|\r)/g,'').
+                replace(/^.*instanceof ([a-zA-Z]*).*$/,'$1');
         }
 
     });

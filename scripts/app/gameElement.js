@@ -1,9 +1,15 @@
 /*global define:true, my:true */
 
-define(['underscore','my.class','app/util'],
+define(['underscore','myclass','app/util'],
 function(_,my,util) {
 
-    var config = {};
+    var componentMap = {
+        'stage' : 'stage',
+        'heading' : 'motionElement.heading',
+        'position' : 'motionElement.position',
+        'direction' : 'motionElement.direction',
+        'className' : 'className'
+    };
 
     var GameElement = my.Class({
 
@@ -12,61 +18,62 @@ function(_,my,util) {
                 return new GameElement(conf);
             }
 
-            config = _.extend(config,conf);
-            this.name = ''+config.shape;
-
+            var that = this,
+            // copy components array
+                comps = conf.components.slice();
+            // then remove from config before merging
+            delete conf.components;
+            // merge conf into object's 'this' scope
+            _.extend(that,conf);
+            // instantiate each component
+            _.each(comps,function(item) {
+                that[item.name] = item.init(that);
+            });
+            
+            that.className = that.shape.toString();
+            console.log(that.className + ' instantiated');
         },
 
-        getStage : function() {
-            return config.stage;
-        },
-        
-        setStage : function(stage) {
-            config.stage = stage;
-        },
-
-        getMotionElement : function() {
-            return config.motionElement;
-        },
-        
-        setMotionElement : function(motionElement) {
-            config.motionElement = motionElement;
-            return this;
-        },
-
-        getShape : function() {
-            return config.shape;
-        },
-        
-        setShape : function(shape) {
-            config.shape = shape;
-            return this;
-        },
-
-        getBehavior : function() {
-            return config.behavior;
-        },
-        
-        setBehavior : function(behavior) {
-            config.behavior = behavior;
-            return this;
-        },
-
-        getName : function() {
-            return this.name;
-        },
-        
-        setName : function(name) {
-            this.name = name;
-        },
-
-        update : function() {
-            config.behavior.update();
-            config.motionElement.update();
+        update : function(stage) {
+            this.behavior.update(stage);
+            this.motionElement.update();
         },
 
         render : function() {
-            config.shape.draw(config);
+            this.shape.draw(this);
+        },
+
+        get : function(key,parent) {
+            if(!!componentMap[key]) {
+                var subkey = '',
+                    curobj = this,
+                    path = this.objectPath(key),
+                    i = 0, l = path.length;
+                    if(parent) { l=l=1; }
+                for(;i<l;i+=1) {
+                    subkey = path[i];
+                    curobj = curobj[subkey];
+                }
+
+                return curobj;
+
+            }
+            return null;
+        },
+
+        objectPath : function (key) {
+            return componentMap[key].split('.');
+        },
+
+        set : function(key,value) {
+            var path = this.objectPath(key);
+            var lastObjKey = path.pop();
+            var parent = this.get(key,true);
+            parent[lastObjKey] = value;
+        },
+
+        toString : function() {
+            return this.className;
         }
 
     });

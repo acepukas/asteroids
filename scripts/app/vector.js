@@ -7,7 +7,7 @@
  *               vector operations. This vector object is only effective as a 2d vector.
  */
 
-define(['my.class','app/util'],
+define(['myclass','app/util'],
 function(my,util) {
 
     var Vector = my.Class({

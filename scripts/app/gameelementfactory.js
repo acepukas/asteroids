@@ -3,7 +3,7 @@
 define(
 [
     'underscore',
-    'my.class',
+    'myclass',
     'app/util',
     'app/motionelement',
     'app/ship',
@@ -24,9 +24,9 @@ define(
     GameElement
 ) {
 
-    var config = {};
+    var config = {},
 
-    var GameElementFactory = my.Class({
+        GameElementFactory = my.Class({
 
         constructor : function(conf) {
             if(!(this instanceof GameElementFactory)) {
@@ -38,62 +38,59 @@ define(
         },
 
         createElement : function (elConf) {
-            var elType = elConf.type || 'null';
-            var createMethod = 'create'+util.cap(elType);
+            var elType = elConf.type || 'null',
+                createMethod = 'create'+util.cap(elType);
             if(this[createMethod]){
-                return this[createMethod](elConf.config);
+                return this[createMethod](elConf.config || {});
             }
             return null;
         },
 
-        createShip : function () {
-
-            var ge = new GameElement({
-                gameElementFactory : this,
-                stage : config.stage
+        getComponentConf : function(configs) {
+            var that = this;
+            _.each(configs,function(conf) {
+                conf.init = function(gameElement) {
+                    this.compProps.gameElement = gameElement;
+                    this.compProps.gameElementFactory = that;
+                    return new conf.construct(conf.compProps);
+                };
             });
+            return configs;
+        },
 
-            var shared = {
-                gameElement : ge
-            };
+        generateGameElement : function(compConfs) {
 
-            ge.setShape(new Ship(_.extend({
-                scale: 2
-            },shared)));
-
-            ge.setMotionElement(new MotionElement(_.extend({
-                maxSpeed:15,
-                mass:500
-            },shared)));
-
-            ge.setBehavior(new HumanControlled(_.extend({
-                turnrate:8
-            },shared)));
+            var that = this,
+                c = this.getComponentConf(compConfs),
+                ge = new GameElement({
+                    gameElementFactory : that,
+                    stage : config.stage,
+                    'components' : c
+                });
 
             return ge;
+        },
+
+        createShip : function () {
+
+            return this.generateGameElement([
+                {name:'motionElement',construct:MotionElement,compProps:{maxSpeed:15,mass:500}},
+                {name:'shape',construct:Ship,compProps:{scale:2}},
+                {name:'behavior',construct:HumanControlled,compProps:{turnrate:8}}
+            ]);
 
         },
 
-        createProjectile : function(config) {
+        createProjectile : function(conf) {
 
-            var me = new MotionElement({
-                stage:this.stage,
-                shape:new Projectile(2.5),
-                maxSpeed:100,
-                mass:600
-            });
-
-            me.setBehavior(new ProjectileBehavior({
-                startSpeed:15,
-                motionElement:me,
-                initDistance:90,
-                source:(config.source || null)
-            }));
-
-            return me;
+            return this.generateGameElement([
+                {name:'motionElement',construct:MotionElement,compProps:{maxSpeed:100,mass:500}},
+                {name:'shape',construct:Projectile,compProps:{scale:2.5}},
+                {name:'behavior',construct:ProjectileBehavior,compProps:{startSpeed:15,initDistance:90,source:(conf.source || null)}}
+            ]);
         }
+
     });
 
     return GameElementFactory;
-
 });

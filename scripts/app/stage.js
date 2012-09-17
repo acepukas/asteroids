@@ -1,6 +1,6 @@
 /*global define:true, my:true */
 
-define(['my.class','jquery','handlebars','app/util'],
+define(['myclass','jquery','handlebars','app/util'],
 function(my,$,Handlebars,util){
 
     var Stage = my.Class((function () {
@@ -53,19 +53,23 @@ function(my,$,Handlebars,util){
             infoPanelTemplate = Handlebars.compile(util.cleanTemplate('#info-panel-template')),
             
             // DOM node for information output
-            infoPanel = $('#infoPanel');
+            infoPanel = $('#infoPanel'),
+
+            renderInterval = null,
+
+            gameLoopInterval = null;
             
         // set up key event listeners
         $(document).keydown(function(e) {
             try {
                 keys[keymap['k'+e.which]]=true;
-            } catch(e) {}
+            } catch(ex) {}
         });
         
         $(document).keyup(function(e) {
             try {
                 keys[keymap['k'+e.which]]=false;
-            } catch(e) {}
+            } catch(ex) {}
         });
 
         return {
@@ -87,12 +91,23 @@ function(my,$,Handlebars,util){
 
             initAnim : function() {
 
-                var renderLoop = util.initTimingLoop(framerate,that.render);
-                var gameLoop = util.initTimingLoop(gamespeed,that.update);
+                var renderLoop = util.initTimingLoop(framerate,that.render),
+                    gameLoop = util.initTimingLoop(gamespeed,that.update);
 
-                setInterval(renderLoop,0);
-                setInterval(gameLoop,0);
+                renderInterval = setInterval(renderLoop,0);
+                gameLoopInterval = setInterval(gameLoop,0);
 
+                $('.stopanim').click($.proxy(function(){
+                    this.stopAnim();
+                },this));
+
+            },
+
+            stopAnim : function() {
+
+                clearInterval(renderInterval);
+                clearInterval(gameLoopInterval);
+                
             },
 
             getCtx : function() {
@@ -120,25 +135,25 @@ function(my,$,Handlebars,util){
             },
 
             update : function() {
-                that.positionMotionElements();
+                that.positionGameElements();
             },
 
             render : function(time) {
                 that.setTime(time);
                 that.clear();
-                that.renderMotionElements();
+                that.renderGameElements();
                 that.updateInfoPanel();
             },
 
-            positionMotionElements : function() {
+            positionGameElements : function() {
                 var i = gameElements.length;
                 while(i--) {
-                    gameElements[i].update();
+                    gameElements[i].update(this);
                     that.correctPosition(gameElements[i]);
                 }
             },
 
-            renderMotionElements : function() {
+            renderGameElements : function() {
                 var i = gameElements.length;
                 while(i--) {
                     gameElements[i].render();
@@ -173,7 +188,7 @@ function(my,$,Handlebars,util){
 
             correctPosition : function(ge) { // getionElement as arg
                 if(ge) {
-                    var p = ge.getMotionElement().getPosition();
+                    var p = ge.get('position');
                     if(p.x > bounds.x2) { p.x = bounds.x1; }
                     if(p.y > bounds.y2) { p.y = bounds.y1; }
                     if(p.x < bounds.x1) { p.x = bounds.x2; }
@@ -185,7 +200,7 @@ function(my,$,Handlebars,util){
                 gameElements.push(ge);
             },
 
-            regeveGameElement : function(ge) {
+            removeGameElement : function(ge) {
                 var i = gameElements.length;
 
                 while(i--) {
@@ -202,12 +217,13 @@ function(my,$,Handlebars,util){
 
             updateInfoPanel : function() {
                 consoleData.infoItems = [];
-                var main = gameElements[0];
-                var mo = main.getMotionElement();
-                var el = main.getName();
+                var main = gameElements[0],
+                    el = main.get('className'),
+                    pos = main.get('position'),
+                    heading = main.get('heading');
                 
-                consoleData.infoItems.push({label:el + ' Position',value:mo.getPosition()});
-                consoleData.infoItems.push({label:el + ' Heading',value:mo.getHeading()});
+                consoleData.infoItems.push({label:el + ' Position',value:pos});
+                consoleData.infoItems.push({label:el + ' Heading',value:heading});
                 consoleData.infoItems.push({label:'fps',value:this.getFps()});
                 infoPanel.html(infoPanelTemplate(consoleData));
             }

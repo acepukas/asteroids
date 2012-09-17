@@ -1,11 +1,11 @@
 /*global define:true, my:true  */
 
-define(['underscore','my.class','app/shape','app/util'],
+define(['underscore','myclass','app/shape','app/util'],
 function(_,my,Shape,util) {
 
-    var config = {};
+    var config = {},
 
-    var Ship = my.Class(Shape,{
+        Ship = my.Class(Shape,{
 
         constructor : function(conf) {
             if(!(this instanceof Ship)) {

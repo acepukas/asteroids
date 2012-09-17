@@ -1,9 +1,7 @@
 /*global define:true, my:true */
 
-define(['underscore','my.class','app/vector','app/util'],
+define(['underscore','myclass','app/vector','app/util'],
 function(_,my,Vector,util){
-
-    var config = {};
 
     var HumanControlled = my.Class({
 
@@ -12,21 +10,17 @@ function(_,my,Vector,util){
                 return new HumanControlled(conf);
             }
 
-            config = _.extend(config,conf);
+            _.extend(this,conf);
 
-            config.turnrate = (!!conf.turnrate) ?
+            this.turnrate = (!!conf.turnrate) ?
                 util.tr(conf.turnrate) :
                 util.tr(8);
 
-            config.engine = new Vector();
-            config.readyToFire = true;
-            config.firingRate = 1000/6;
-            config.thrust = 0.3;
+            this.engine = new Vector();
+            this.readyToFire = true;
+            this.firingRate = 1000/6;
+            this.thrust = 0.3;
 
-        },
-
-        getMotionElement : function() {
-            return config.gameElement.getMotionElement();
         },
 
         update : function(stage) {
@@ -35,73 +29,73 @@ function(_,my,Vector,util){
 
         keyEvents : function(stage) {
 
-            var keys = config.gameElement.getStage().getKeys();
+            var keys = stage.getKeys(),
+                heading = this.gameElement.get('heading');
 
             this.updateSpeed(keys.up);
 
             if(keys.up) {
-                this.getMotionElement().getHeading().combine(config.engine);
+                heading.combine(this.engine);
             }
 
             if(keys.left) {
-                this.setDirection(-config.turnrate); 
+                this.setDirection(-this.turnrate); 
             }
 
             if(keys.right) {
-                this.setDirection(config.turnrate); 
+                this.setDirection(this.turnrate); 
             }
 
-            this.getMotionElement().setDirection(this.getDirection());
+            this.gameElement.set('direction',this.getDirection());
 
             if(keys.space) {
-                // this.fireProjectile(stage); 
+                this.fireProjectile(stage); 
             }
         },
 
         updateSpeed : function (thrustEngaged) {
-            config.engine.mag = (thrustEngaged) ? config.thrust : 0;
+            this.engine.mag = (thrustEngaged) ? this.thrust : 0;
         },
 
         setDirection : function(step) {
-            var d = config.engine.dir + step;
+            var d = this.engine.dir + step;
             if(Math.abs(d) > Math.PI) { d = -(d - (d % Math.PI)); }
-            config.engine.dir = d;
+            this.engine.dir = d;
         },
 
-        fireProjectile : function  (stage) {
-            var that = this;
+        getDirection : function() {
+            return this.engine.dir;
+        },
+
+        fireProjectile : function(stage) {
+            var that = this,
+                mo = null,
+                ge = null;
             if(that.readyToFire) {
+                mo = this.gameElement;
                 that.readyToFire = false;
-                var me = that.mef.createElement({
+                ge = that.gameElementFactory.createElement({
                     type:'projectile',
                     config:{
-                        source:that.getMotionElement()
+                        source:mo
                     }
                 });
-                stage.addMotionElement(me);
+                stage.addGameElement(ge);
                 setTimeout(function() {
                     that.readyToFire = true;   
                 },that.firingRate);
             }
-        },
-
-        getDirection : function() {
-            return config.engine.dir;
-        },
-
-        getPosition : function() {
-            return this.getMotionElement().getPosition();
-        },
+        }/*,
 
         toString : function() {
             var out = this.getMotionElement().toString(),
                 o = [];
                 out += '<br />';
-            o.push('thrust:   ' + util.round(config.engine.mag,5));
-            o.push('engine:   ' + config.engine);
+            o.push('thrust:   ' + util.round(this.engine.mag,5));
+            o.push('engine:   ' + this.engine);
             out += o.join('<br />');
             return out;
-        }
+        }*/
 
     });
 
