@@ -31,7 +31,6 @@ function(_,my,util) {
             });
             
             that.className = that.shape.toString();
-            console.log(that.className + ' instantiated');
         },
 
         update : function(stage) {
