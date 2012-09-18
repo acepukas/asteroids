@@ -9,9 +9,9 @@ function(_,my,util) {
         'heading' : 'motionElement.heading',
         'position' : 'motionElement.position',
         'direction' : 'motionElement.direction'
-    };
+    },
 
-    var GameElement = my.Class({
+        GameElement = my.Class({
 
         constructor : function(conf) {
             if(!(this instanceof GameElement)) {
@@ -49,7 +49,7 @@ function(_,my,util) {
                     path = this.objectPath(key),
                     i = 0, l = path.length;
                     if(parent) { l=l-1; }
-                for(;i<l;i+=1) {
+                for(i=0;i<l;i+=1) {
                     subkey = path[i];
                     curobj = curobj[subkey];
                 }
@@ -65,9 +65,9 @@ function(_,my,util) {
         },
 
         set : function(key,value) {
-            var path = this.objectPath(key);
-            var lastObjKey = path.pop();
-            var parent = this.get(key,true);
+            var path = this.objectPath(key),
+                lastObjKey = path.pop(),
+                parent = this.get(key,true);
             parent[lastObjKey] = value;
         },
 
