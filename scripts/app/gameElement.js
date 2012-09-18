@@ -5,10 +5,10 @@ function(_,my,util) {
 
     var componentMap = {
         'stage' : 'stage',
+        'className' : 'className',
         'heading' : 'motionElement.heading',
         'position' : 'motionElement.position',
-        'direction' : 'motionElement.direction',
-        'className' : 'className'
+        'direction' : 'motionElement.direction'
     };
 
     var GameElement = my.Class({
@@ -48,7 +48,7 @@ function(_,my,util) {
                     curobj = this,
                     path = this.objectPath(key),
                     i = 0, l = path.length;
-                    if(parent) { l=l=1; }
+                    if(parent) { l=l-1; }
                 for(;i<l;i+=1) {
                     subkey = path[i];
                     curobj = curobj[subkey];
