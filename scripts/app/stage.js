@@ -59,6 +59,18 @@ function(my,$,Handlebars,util){
 
             gameLoopInterval = null;
             
+        // paul irish's requestAnimationFrame shim
+        window.requestAnimFrame = (function(){
+            return  window.requestAnimationFrame       || 
+                    window.webkitRequestAnimationFrame || 
+                    window.mozRequestAnimationFrame    || 
+                    window.oRequestAnimationFrame      || 
+                    window.msRequestAnimationFrame     || 
+                    function( callback ){
+                        window.setTimeout(callback, 1000 / 60);
+                    };
+        })();
+            
         // set up key event listeners
         $(document).keydown(function(e) {
             try {
@@ -91,21 +103,23 @@ function(my,$,Handlebars,util){
 
             initAnim : function() {
 
-                var renderLoop = util.initTimingLoop(framerate,that.render),
-                    gameLoop = util.initTimingLoop(gamespeed,that.update);
-
-                renderInterval = setInterval(renderLoop,0);
+                var gameLoop = util.initTimingLoop(gamespeed,that.update);
                 gameLoopInterval = setInterval(gameLoop,0);
 
                 $('.stopanim').click($.proxy(function(){
                     this.stopAnim();
                 },this));
 
+                (function animLoop() {
+                    requestAnimFrame(animLoop);
+                    that.render(Date.now());
+                }());
+
             },
 
             stopAnim : function() {
 
-                clearInterval(renderInterval);
+                // clearInterval(renderInterval);
                 clearInterval(gameLoopInterval);
                 
             },
@@ -224,7 +238,7 @@ function(my,$,Handlebars,util){
                 
                 consoleData.infoItems.push({label:el + ' Position',value:pos});
                 consoleData.infoItems.push({label:el + ' Heading',value:heading});
-                consoleData.infoItems.push({label:'fps',value:this.getFps()});
+                // consoleData.infoItems.push({label:'fps',value:this.getFps()});
                 infoPanel.html(infoPanelTemplate(consoleData));
             }
         };
