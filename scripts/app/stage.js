@@ -24,7 +24,7 @@ function(my,$,Handlebars,util){
                 k32:'space'
             },
 
-            // stores stage oundries in 
+            // stores stage boundries in 
             // order to correct object position
             bounds = {},
 
@@ -40,10 +40,8 @@ function(my,$,Handlebars,util){
             // stores a list of motion objects
             gameElements = [],
 
-            // 60 frames per second
-            // seems that to register as 60, + 10 is needed
-            framerate = Math.round(1000/72),
-
+            // speed for logic loop which runs 
+            // independently of animation loop
             gamespeed = Math.round(1000/50),
 
             // info obj for output
@@ -69,7 +67,7 @@ function(my,$,Handlebars,util){
                     function( callback ){
                         window.setTimeout(callback, 1000 / 60);
                     };
-        })();
+        }());
             
         // set up key event listeners
         $(document).keydown(function(e) {
@@ -111,7 +109,7 @@ function(my,$,Handlebars,util){
                 },this));
 
                 (function animLoop() {
-                    requestAnimFrame(animLoop);
+                    window.requestAnimFrame(animLoop);
                     that.render(Date.now());
                 }());
 
