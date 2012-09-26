@@ -116,10 +116,7 @@ function(my,$,Handlebars,util){
             },
 
             stopAnim : function() {
-
-                // clearInterval(renderInterval);
                 clearInterval(gameLoopInterval);
-                
             },
 
             getCtx : function() {
@@ -173,7 +170,7 @@ function(my,$,Handlebars,util){
             },
 
             setUpCanvas : function() {
-                var canvas = $('canvas')[0],
+                var canvas = $('#canvas')[0],
                     wh = that.getCanvasSize(that.width);
                 
                 canvas.width = wh[0];
@@ -224,7 +221,7 @@ function(my,$,Handlebars,util){
             },
 
             getFps : function() {
-                return util.round(1000/(+new Date()-time),0);
+                return util.round(1000/(Date.now()-this.getTime()),0);
             },
 
             updateInfoPanel : function() {
