@@ -8,11 +8,19 @@
  *
  */
 
-define(['underscore','myclass','app/point','app/vector','app/util'],
-function(_,my,Point,Vector,util){
-
-    var prvt = {};
-    var stage = null;
+define([
+    'underscore',
+    'myclass',
+    'app/point',
+    'app/vector',
+    'app/util'
+],function(
+    _,
+    my,
+    Point,
+    Vector,
+    util
+){
 
     var MotionElement = my.Class({
 
@@ -25,7 +33,7 @@ function(_,my,Point,Vector,util){
                 this[key] = val; 
             }));
 
-            stage = this.gameElement.get('stage');
+            var stage = this.gameElement.get('stage');
 
             this.position = new Point(
                 stage.getBounds().x2/2,
@@ -49,12 +57,12 @@ function(_,my,Point,Vector,util){
             }
         },
 
-        update : function() {
-            this.updatePosition();
+        update : function(time) {
+            this.updatePosition(time);
         },
 
-        updatePosition : function() {
-            this.heading = this.calcFinalVelocity(this.heading,-this.friction);
+        updatePosition : function(time) {
+            this.heading = this.calcFinalVelocity(this.heading,-this.friction,time);
             this.heading.mag = this.restrictVelocity(this.heading.mag);
             this.position = this.heading.combineCartesian(this.position);
         },
@@ -67,10 +75,10 @@ function(_,my,Point,Vector,util){
             return v;
         },
 
-        calcFinalVelocity : function(vector, force) {
+        calcFinalVelocity : function(vector, force, time) {
             
             var vel = 0,
-                t = stage.getTime(),
+                t = time,
                 accel = util.getAcceleration(force,this.mass,t);
 
             vector.mag += util.getVelocity(vel,accel,t);

@@ -1,14 +1,23 @@
 /*global define:true, my:true */
 
-define(['myclass','jquery','handlebars','app/util'],
-function(my,$,Handlebars,util){
+define([
+    'myclass',
+    'jquery',
+    'handlebars',
+    'app/canvaswrapper',
+    'app/util'
+], function(
+    my,
+    $,
+    Handlebars,
+    CanvasWrapper,
+    util
+){
 
     var Stage = my.Class((function () {
 
         // tracks key status
-        var that = null, // for closure issues when scope is needed
-        
-            keys = {
+        var keys = {
                 right:false,
                 left:false,
                 up:false,
@@ -24,18 +33,14 @@ function(my,$,Handlebars,util){
                 k32:'space'
             },
 
-            // stores stage boundries in 
-            // order to correct object position
-            bounds = {},
-
             // stores 
             time = 0,
 
             // global friction
-            friction = 1,
+            friction = 1.5,
 
             // canvas context object
-            ctx = null,
+            canvas = null,
 
             // stores a list of motion objects
             gameElements = [],
@@ -57,18 +62,6 @@ function(my,$,Handlebars,util){
 
             gameLoopInterval = null;
             
-        // paul irish's requestAnimationFrame shim
-        window.requestAnimFrame = (function(){
-            return  window.requestAnimationFrame       || 
-                    window.webkitRequestAnimationFrame || 
-                    window.mozRequestAnimationFrame    || 
-                    window.oRequestAnimationFrame      || 
-                    window.msRequestAnimationFrame     || 
-                    function( callback ){
-                        window.setTimeout(callback, 1000 / 60);
-                    };
-        }());
-            
         // set up key event listeners
         $(document).keydown(function(e) {
             try {
@@ -89,29 +82,24 @@ function(my,$,Handlebars,util){
                     return new Stage(width);
                 }
                 
-                // capture this as that
-                that = this;
-                that.width = width;
+                this.width = width;
 
             },
 
             init: function() {
-                ctx = that.setUpCanvas();
+                canvas = new CanvasWrapper('#canvas',this.width,'16:9');
             },
 
             initAnim : function() {
 
-                var gameLoop = util.initTimingLoop(gamespeed,that.update);
+                var gameLoop = util.initTimingLoop(gamespeed,this.update,this);
                 gameLoopInterval = setInterval(gameLoop,0);
 
                 $('.stopanim').click($.proxy(function(){
                     this.stopAnim();
                 },this));
 
-                (function animLoop() {
-                    window.requestAnimFrame(animLoop);
-                    that.render(Date.now());
-                }());
+                canvas.initRenderLoop(this.render,this);
 
             },
 
@@ -119,8 +107,8 @@ function(my,$,Handlebars,util){
                 clearInterval(gameLoopInterval);
             },
 
-            getCtx : function() {
-                return ctx;
+            getCanvas : function() {
+                return canvas;
             },
 
             getTime : function() {
@@ -132,7 +120,7 @@ function(my,$,Handlebars,util){
             },
 
             getBounds : function() {
-                return bounds;
+                return canvas.getBounds();;
             },
 
             getKeys : function() {
@@ -143,22 +131,22 @@ function(my,$,Handlebars,util){
                 return friction;
             },
 
-            update : function() {
-                that.positionGameElements();
+            update : function(updTime) {
+                this.updateGameElements(updTime);
             },
 
             render : function(time) {
-                that.setTime(time);
-                that.clear();
-                that.renderGameElements();
-                that.updateInfoPanel();
+                this.setTime(time);
+                canvas.clear();
+                this.renderGameElements();
+                this.updateInfoPanel();
             },
 
-            positionGameElements : function() {
+            updateGameElements : function(updTime) {
                 var i = gameElements.length;
                 while(i--) {
-                    gameElements[i].update(this);
-                    that.correctPosition(gameElements[i]);
+                    gameElements[i].update(updTime);
+                    this.correctPosition(gameElements[i]);
                 }
             },
 
@@ -169,33 +157,8 @@ function(my,$,Handlebars,util){
                 }
             },
 
-            setUpCanvas : function() {
-                var canvas = $('#canvas')[0],
-                    wh = that.getCanvasSize(that.width);
-                
-                canvas.width = wh[0];
-                canvas.height = wh[1];
-                ctx = canvas.getContext("2d");
-
-                bounds.x1 = 0;
-                bounds.y1 = 0;
-                bounds.x2 = canvas.width;
-                bounds.y2 = canvas.height;
-
-                that.clear = function() {
-                    ctx.clearRect(bounds.x1,bounds.y1,bounds.x2,bounds.y2);
-                };
-
-                return ctx;
-            },
-            
-            getCanvasSize : function(sz) {
-                var w = sz,
-                    h = w * 9 / 16;
-                return [w,h];
-            },
-
             correctPosition : function(ge) { // getionElement as arg
+                var bounds = this.getBounds();
                 if(ge) {
                     var p = ge.get('position');
                     if(p.x > bounds.x2) { p.x = bounds.x1; }

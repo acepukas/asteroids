@@ -1,7 +1,11 @@
 /*global define:true, my:true */
-define(['jquery','underscore'],function($,_){
-
-    var bboffset = 5;
+define([
+    'jquery',
+    'underscore'
+],function(
+    $,
+    _
+){
 
     return {
 
@@ -132,87 +136,16 @@ define(['jquery','underscore'],function($,_){
             return this.toCartesian(vec);
         },
 
-        plotPoints : function(params) {
-            var ps = params.points,
-                l = ps.length,
-                i = l,
-                tp = null,
-                x1=Infinity,
-                y1=Infinity,
-                x2=-Infinity,
-                y2=-Infinity,
-                dir = params.dir,
-                pos = params.pos,
-                scale = params.scale;
-
-            while(i--) {
-                tp = ps[i];
-                tp = this.rotate(tp,dir);
-                this.scale(tp,scale);
-                this.translate(tp,pos);
-                if(i===l) {
-                    params.callback(tp,'moveTo');
-                } else {
-                    params.callback(tp,'lineTo');
-                }
-                if(tp.x<x1) {x1 = tp.x;}
-                if(tp.y<y1) {y1 = tp.y;}
-                if(tp.x>x2) {x2 = tp.x;}
-                if(tp.y>y2) {y2 = tp.y;}
-            }
-
-            tp = i = l = null;
-            return this.getBoundsAndBlitZone(x1,x2,y1,y2);
-        },
-
-        plotText : function(params){
-            var ctx = params.stage.getCtx(),
-                pos = params.motionElement.getPosition(),
-                textMetrics = null,
-                height = 48,
-                x1 = 0,
-                y1 = 0,
-                x2 = 0,
-                y2 = 0;
-
-            ctx.font = height.toString() + "px serif";
-            ctx.textBaseline = "top";
-            ctx.fillText(params.shapeData,pos.x,pos.y);
-            textMetrics = ctx.measureText(params.shapeData);
-
-            x1 = pos.x;
-            y1 = pos.y;
-            x2 = pos.x + textMetrics.width;
-            y2 = pos.y + height;
-
-            return this.getBoundsAndBlitZone(x1,x2,y1,y2);
-
-        },
-
-        getBoundsAndBlitZone : function(x1,x2,y1,y2) {
-            return {
-                'bounds':{x:x1,y:y1,w:(x2-x1),h:(y2-y1)},
-                'blitZone':{x:x1-bboffset,y:y1-bboffset,w:(x2-x1)+(bboffset*2),h:(y2-y1)+(bboffset*2)}
-            };
-        },
-
-        plotShapeData : function(params) {
-            var p = params.points,
-                shDtType = this.type(p),
-                funcs = {'array':this.plotPoints,'string':this.plotText};
-            return funcs[shDtType].call(this,params);
-        },
-
         addPoints : function(p1,p2) {
             return {x:p1.x+p2.x,y:p1.y+p2.y};
         },
 
 
-        initTimingLoop : function(timing,callback) {
+        initTimingLoop : function(timing,callback,context) {
             var time = +new Date();
             return function() {
                 if((+new Date())-time > timing) {
-                    callback(time);
+                    callback.call(context,time);
                     time = +new Date();
                 }
             };
@@ -286,6 +219,14 @@ define(['jquery','underscore'],function($,_){
             return subject.replace(/^([a-z])(.*)$/,function(orig,first,rest){
                 return first.toUpperCase() + rest;
             });
+        },
+
+        // w: width
+        // r: ratio
+        sizeByRatio : function(w,r) {
+            var rParts = r.split(':');
+            var h = w * rParts[1] / rParts[0];
+            return {width:w,height:h};
         }
 
     };

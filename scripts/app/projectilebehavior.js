@@ -27,8 +27,9 @@ function(my,Vector,Point,util) {
             }
         },
 
-        update : function(stage) {
+        update : function() {
             if((+(new Date()) - this.birthTime) > 700) {
+                var stage = this.gameElement.get('stage');
                 stage.removeGameElement(this.gameElement);
             }
         }

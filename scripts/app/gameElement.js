@@ -33,9 +33,9 @@ function(_,my,util) {
             that.className = that.shape.toString();
         },
 
-        update : function(stage) {
-            this.behavior.update(stage);
-            this.motionElement.update();
+        update : function(time) {
+            this.behavior.update();
+            this.motionElement.update(time);
         },
 
         render : function() {

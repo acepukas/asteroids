@@ -23,13 +23,14 @@ function(_,my,Vector,util){
 
         },
 
-        update : function(stage) {
-            this.keyEvents(stage);
+        update : function() {
+            this.keyEvents();
         },
 
-        keyEvents : function(stage) {
+        keyEvents : function() {
 
-            var keys = stage.getKeys(),
+            var stage = this.gameElement.get('stage'),
+                keys = stage.getKeys(),
                 heading = this.gameElement.get('heading');
 
             this.updateSpeed(keys.up);
