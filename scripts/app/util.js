@@ -26,6 +26,32 @@ define([
             return Math.round(num*base10)/base10;
         },
 
+        /**
+         * randRange returns either a number 
+         * from 0 to supplied positive integer
+         * (single argument), or return a rand num
+         * from "floor" first arg, to "ceiling" second arg
+         *
+         * result will never excede the high number - 1
+         *
+         * @method:randRange
+         * @param:highOrLow high is only arg
+         * @param:highOnly
+         */
+        randRange : function() {
+            var args = _.toArray(arguments),
+                multiplyer, floor;
+        
+            if(args.length > 1) {
+                 multiplyer = args[1]-args[0];
+                 floor = args[0] + 1;
+            } else {
+                 multiplyer = args[0];
+                 floor = 0;
+            }
+            return floor + Math.floor(Math.random() * multiplyer);
+        },
+
         getVelocity : function(v,a,t) {
             return v + (a*(+new Date() - t));
         },
@@ -82,6 +108,10 @@ define([
             return (!thisfn.fnresults[fncode]) ?
                 thisfn.fnresults[fncode] = fn.call(context||window) :
                 thisfn.fnresults[fncode];
+        },
+
+        distanceBetweenPoints : function(p1,p2) {
+           return Math.sqrt(Math.pow(p2.x-p1.x,2)+Math.pow(p2.y-p1.y,2));
         },
 
         calcAngle : function(p) {

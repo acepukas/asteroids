@@ -8,7 +8,11 @@ function(_,my,util) {
         'className' : 'className',
         'heading' : 'motionElement.heading',
         'position' : 'motionElement.position',
-        'direction' : 'motionElement.direction'
+        'direction' : 'motionElement.direction',
+        'minSpeed' : 'motionElement.minSpeed',
+        'collisionRadius' : 'motionElement.collisionRadius',
+        'motionElement' : 'motionElement',
+        'behavior' : 'behavior'
     },
 
         GameElement = my.Class({

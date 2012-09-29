@@ -9,12 +9,14 @@
  */
 
 define([
+    'jquery',
     'underscore',
     'myclass',
     'app/point',
     'app/vector',
     'app/util'
 ],function(
+    $,
     _,
     my,
     Point,
@@ -29,9 +31,9 @@ define([
                 return new MotionElement(conf);
             }
 
-            _.each(conf,this.proxy(function(val,key) {
+            _.each(conf,$.proxy(function(val,key) {
                 this[key] = val; 
-            }));
+            },this));
 
             var stage = this.gameElement.get('stage');
 
@@ -39,22 +41,16 @@ define([
                 stage.getBounds().x2/2,
                 stage.getBounds().y2/2
             );
-
+            
+            this.collisionRadius = this.collisionRadius || 10;
+            this.minSpeed = this.minSpeed || 0;
             this.direction = 0;
-
             this.heading = new Vector();
 
-            this.mass = conf.mass || 2000;
-            this.maxSpeed = conf.maxSpeed || 12;
+            this.mass = this.mass || 2000;
+            this.maxSpeed = this.maxSpeed || 12;
             this.friction = stage.getFriction();
 
-        },
-
-        proxy : function(fn) {
-            var self = this;
-            return function () {
-                fn.apply(self,arguments);
-            }
         },
 
         update : function(time) {
@@ -69,9 +65,8 @@ define([
 
         restrictVelocity : function(v) {
             // restrict velocity
-            var minSpeed = 0.1;
             v = (v >= this.maxSpeed) ? this.maxSpeed : v;
-            v = (v <= minSpeed) ? minSpeed : v;
+            v = (v <= this.minSpeed) ? this.minSpeed : v;
             return v;
         },
 
@@ -83,6 +78,15 @@ define([
 
             vector.mag += util.getVelocity(vel,accel,t);
             return vector;
+        },
+
+        collisionDetected : function(collider) {
+            if(!!this.gameElement) {
+                var beh = this.gameElement.get('behavior');
+                if(!!beh.collision) {
+                    beh.collision(collider);
+                }
+            }
         }
 
     });

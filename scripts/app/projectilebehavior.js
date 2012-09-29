@@ -29,8 +29,10 @@ function(my,Vector,Point,util) {
 
         update : function() {
             if((+(new Date()) - this.birthTime) > 700) {
-                var stage = this.gameElement.get('stage');
-                stage.removeGameElement(this.gameElement);
+                if(!!this.gameElement) {
+                    var stage = this.gameElement.get('stage');
+                    stage.removeGameElement(this.gameElement);
+                }
             }
         }
 

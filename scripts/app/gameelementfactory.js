@@ -10,9 +10,10 @@ define(
     'app/humancontrolled',
     'app/projectile',
     'app/projectilebehavior',
+    'app/asteroid',
+    'app/asteroidbehavior',
     'app/gameElement'
-]
-, function(
+] , function(
     _,
     my,
     util,
@@ -21,6 +22,8 @@ define(
     HumanControlled,
     Projectile,
     ProjectileBehavior,
+    Asteroid,
+    AsteroidBehavior,
     GameElement
 ) {
 
@@ -74,11 +77,20 @@ define(
         createShip : function () {
 
             return this.generateGameElement([
-                {name:'motionElement',construct:MotionElement,compProps:{maxSpeed:15,mass:500}},
+                {name:'motionElement',construct:MotionElement,compProps:{collisionRadius:40,maxSpeed:15,mass:500}},
                 {name:'shape',construct:Ship,compProps:{scale:2}},
                 {name:'behavior',construct:HumanControlled,compProps:{turnrate:8}}
             ]);
 
+        },
+
+        createAsteroid : function() {
+            
+            return this.generateGameElement([
+                {name:'motionElement',construct:MotionElement,compProps:{collisionRadius:40,minSpeed:util.randRange(10,200)/100,maxSpeed:2,mass:10000}},
+                {name:'shape',construct:Asteroid,compProps:{scale:1}},
+                {name:'behavior',construct:AsteroidBehavior,compProps:{}}
+            ]);
         },
 
         createProjectile : function(conf) {

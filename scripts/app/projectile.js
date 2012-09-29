@@ -1,6 +1,15 @@
 /*global define:true, my:true */
-define(['myclass','underscore','app/shape','app/util'],
-function(my,_,Shape,util) {
+define([
+    'myclass',
+    'underscore',
+    'app/shape',
+    'app/util'
+] , function(
+    my,
+    _,
+    Shape,
+    util
+) {
 
     var config = {},
     

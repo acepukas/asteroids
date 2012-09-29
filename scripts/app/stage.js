@@ -145,15 +145,20 @@ define([
             updateGameElements : function(updTime) {
                 var i = gameElements.length;
                 while(i--) {
-                    gameElements[i].update(updTime);
-                    this.correctPosition(gameElements[i]);
+                    if(!!gameElements[i]) {
+                        gameElements[i].update(updTime);
+                        this.correctPosition(gameElements[i]);
+                        this.detectCollisions(gameElements[i]);
+                    }
                 }
             },
 
             renderGameElements : function() {
                 var i = gameElements.length;
                 while(i--) {
-                    gameElements[i].render();
+                    if(!!gameElements[i]) {
+                        gameElements[i].render();
+                    }
                 }
             },
 
@@ -168,6 +173,22 @@ define([
                 }
             },
 
+            detectCollisions : function(ge) {
+                var otherGameElements = _.filter(gameElements,function(item) {
+                    return (item !== ge);
+                });
+
+                _.each(otherGameElements,function(item) {
+                    if(!item || !ge) return;
+                    var distance = util.distanceBetweenPoints(ge.get('position'),item.get('position'));
+                    var selfCollisionRadius = ge.get('collisionRadius');
+                    var itemCollisionRadius = item.get('collisionRadius');
+                    if(distance < (selfCollisionRadius + itemCollisionRadius)){
+                        ge.get('motionElement').collisionDetected(item);
+                    }
+                });
+            },
+
             addGameElement : function(ge) {
                 gameElements.push(ge);
             },
@@ -177,10 +198,14 @@ define([
 
                 while(i--) {
                     if(gameElements[i] === ge) {
-                        gameElements.splice(1,i); 
+                        gameElements.splice(i,1); 
                     }
                 }
                 
+            },
+
+            getNumOfGameElements : function  () {
+                return gameElements.length;
             },
 
             getFps : function() {
