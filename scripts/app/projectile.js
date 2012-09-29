@@ -77,7 +77,7 @@ define([
                     }
                 },
 
-                grad = util.gradient('006699','ff6666',4),
+                grad = util.gradient('cc0000','cc6600',4),
 
                 key = null,
                 i = 0,
