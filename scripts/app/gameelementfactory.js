@@ -77,7 +77,7 @@ define(
         createShip : function () {
 
             return this.generateGameElement([
-                {name:'motionElement',construct:MotionElement,compProps:{collisionRadius:40,maxSpeed:15,mass:500}},
+                {name:'motionElement',construct:MotionElement,compProps:{collisionRadius:40,maxSpeed:15,minSpeed:1.9,mass:500}},
                 {name:'shape',construct:Ship,compProps:{scale:2}},
                 {name:'behavior',construct:HumanControlled,compProps:{turnrate:8}}
             ]);

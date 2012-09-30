@@ -3,6 +3,11 @@
     padding:0;
 }
 
+html, body {
+    height: 100%;
+    width: 100%;
+}
+
 body {
     font-family:monospace;
     font-size:62.5%;
@@ -20,10 +25,12 @@ canvas {
 }
 
 #infoPanel {
-    border:1px solid #333;
-    background:#222;
+    position: absolute;
+    top: 0;
+    right: 0;
     padding:20px;
     line-height:30px;
+    width: 600px;
 }
 
 #infoPanel ul {

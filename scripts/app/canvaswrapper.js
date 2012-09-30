@@ -30,30 +30,44 @@ define([
 
     var CanvasWrapper = my.Class({
 
-        constructor : function(tagId,width,ratio) {
+        constructor : function(tagId) {
             if(!(this instanceof CanvasWrapper)) {
-                return new CanvasWrapper(tagId,width,ratio);
+                return new CanvasWrapper(tagId);
             }
 
             this.tagId = tagId;
-            this.width = width;
-            this.ratio = ratio;
             this.initialize();
         },
 
         initialize : function() {
-            var canvasSize = util.sizeByRatio(this.width,this.ratio);
 
+            var canvas = $(this.tagId)[0];
+            this.setCanvasSize(canvas);
+
+            this.context = canvas.getContext("2d");
+
+            $(window).resize($.proxy(function() {
+                this.setCanvasSize(canvas);
+            },this));
+        },
+
+        setCanvasSize : function(canvas) {
+            var canvasSize = this.toBodySize();
             bounds.x1 = 0;
             bounds.y1 = 0;
             bounds.x2 = canvasSize.width;
             bounds.y2 = canvasSize.height;
 
-            var canvas = $(this.tagId)[0];
             canvas.width = canvasSize.width;
             canvas.height = canvasSize.height;
+        },
 
-            this.context = canvas.getContext("2d");
+        toBodySize : function() {
+            var b = $('body');
+            return {
+                width: b.outerWidth(false) - 5,
+                height : b.outerHeight(false) - 5
+            };
         },
 
         initRenderLoop : function(renderCallback,context) {

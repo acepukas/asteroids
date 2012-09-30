@@ -5,7 +5,7 @@ function(Stage,GameElementFactory) {
 
     return {
         start : function(){
-            var stage = new Stage(1000);
+            var stage = new Stage();
             stage.init();
             var gef = new GameElementFactory({'stage':stage});
 

@@ -77,17 +77,14 @@ define([
 
         return {
 
-            constructor : function(width) {
+            constructor : function() {
                 if(!(this instanceof Stage)) {
-                    return new Stage(width);
+                    return new Stage();
                 }
-                
-                this.width = width;
-
             },
 
             init: function() {
-                canvas = new CanvasWrapper('#canvas',this.width,'16:9');
+                canvas = new CanvasWrapper('#canvas');
             },
 
             initAnim : function() {
