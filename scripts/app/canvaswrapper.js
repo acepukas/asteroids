@@ -65,8 +65,8 @@ define([
         toBodySize : function() {
             var b = $('body');
             return {
-                width: b.outerWidth(false) - 5,
-                height : b.outerHeight(false) - 5
+                width: b.outerWidth(false),
+                height : b.outerHeight(false)
             };
         },
 

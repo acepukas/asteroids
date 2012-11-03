@@ -15,7 +15,7 @@ function(Stage,GameElementFactory) {
             stage.addGameElement(ge);
 
             var addAsteroid = function() {
-                if(stage.getNumOfGameElements() < 15) {
+                if(stage.getNumOfGameElements() < 5) {
                     var asteroid = gef.createElement({
                         type:'asteroid'
                     });
@@ -23,7 +23,7 @@ function(Stage,GameElementFactory) {
                 }
             };
 
-            var i = 0, l = 10;
+            var i = 0, l = 5;
             for(i=0;i<l;i+=1) {
                 addAsteroid();
             }

@@ -50,7 +50,6 @@ define([
             this.mass = this.mass || 2000;
             this.maxSpeed = this.maxSpeed || 12;
             this.friction = stage.getFriction();
-
         },
 
         update : function(time) {

@@ -171,17 +171,16 @@ define([
             },
 
             detectCollisions : function(ge) {
-                var otherGameElements = _.filter(gameElements,function(item) {
-                    return (item !== ge);
-                });
-
-                _.each(otherGameElements,function(item) {
+                _.each(gameElements,function(item) {
                     if(!item || !ge) return;
-                    var distance = util.distanceBetweenPoints(ge.get('position'),item.get('position'));
-                    var selfCollisionRadius = ge.get('collisionRadius');
-                    var itemCollisionRadius = item.get('collisionRadius');
-                    if(distance < (selfCollisionRadius + itemCollisionRadius)){
-                        ge.get('motionElement').collisionDetected(item);
+
+                    if(item !== ge) {
+                        var distance = util.distanceBetweenPoints(ge.get('position'),item.get('position'));
+                        var selfCollisionRadius = ge.get('collisionRadius');
+                        var itemCollisionRadius = item.get('collisionRadius');
+                        if(distance < (selfCollisionRadius + itemCollisionRadius)){
+                            ge.get('motionElement').collisionDetected(item);
+                        }
                     }
                 });
             },
