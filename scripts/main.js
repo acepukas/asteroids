@@ -7,7 +7,8 @@ requirejs.config({
         jquery : 'jquery-1.8.1.min',
         underscore : 'underscore-min',
         handlebars : 'handlebars-1.0.0.beta.6',
-        myclass : 'my.class'
+        myclass : 'my.class',
+        Box2D : 'Box2D'
     },
     shim : {
         underscore : {
@@ -18,11 +19,16 @@ requirejs.config({
         },
         myclass : {
             exports : 'my' 
+        },
+        Box2D : {
+            exports : 'Box2D'
         }
     }
 });
 
-requirejs(['app/game'],
+requirejs(['app/game','Box2D','jquery'],
 function(app) {
-    app.start();
+    $(document).ready(function() {
+      app.start();
+    })
 });

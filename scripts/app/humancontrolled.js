@@ -21,6 +21,8 @@ function(_,my,Vector,util){
             this.firingRate = 1000/6;
             this.thrust = 0.3;
 
+            this.body = this.gameElement.get('body');
+
         },
 
         update : function() {
@@ -30,24 +32,35 @@ function(_,my,Vector,util){
         keyEvents : function() {
 
             var stage = this.gameElement.get('stage'),
-                keys = stage.getKeys(),
-                heading = this.gameElement.get('heading');
+                keys = stage.getKeys();
+                // heading = this.gameElement.get('heading');
 
-            this.updateSpeed(keys.up);
+            // this.updateSpeed(keys.up);
 
             if(keys.up) {
-                heading.combine(this.engine);
+                // heading.combine(this.engine);
+                var force = 10000;
+                var angle = this.body.GetAngle();
+                var vecx = util.toCartesianX(force,angle);
+                var vecy = util.toCartesianY(force,angle);
+                this.body.ApplyForce(new Box2D.Common.Math.b2Vec2(vecx,vecy),this.body.GetWorldCenter());
             }
 
             if(keys.left) {
-                this.setDirection(-this.turnrate); 
+                // this.adjustDirection(-this.turnrate); 
+                var angle = this.body.GetAngle();
+                angle = this.adjustDirection(angle,-this.turnrate);
+                this.body.SetAngle(angle);
             }
 
             if(keys.right) {
-                this.setDirection(this.turnrate); 
+                // this.adjustDirection(this.turnrate); 
+                var angle = this.body.GetAngle();
+                angle = this.adjustDirection(angle,this.turnrate);
+                this.body.SetAngle(angle);
             }
 
-            this.gameElement.set('direction',this.getDirection());
+            // this.gameElement.set('direction',this.getDirection());
 
             if(keys.space) {
                 this.fireProjectile(stage); 
@@ -58,10 +71,10 @@ function(_,my,Vector,util){
             this.engine.mag = (thrustEngaged) ? this.thrust : 0;
         },
 
-        setDirection : function(step) {
-            var d = this.engine.dir + step;
+        adjustDirection : function(angle,step) {
+            var d = angle + step;
             if(Math.abs(d) > Math.PI) { d = -(d - (d % Math.PI)); }
-            this.engine.dir = d;
+            return d;
         },
 
         getDirection : function() {

@@ -61,7 +61,7 @@ define([
             renderInterval = null,
 
             gameLoopInterval = null;
-            
+
         // set up key event listeners
         $(document).keydown(function(e) {
             try {
@@ -77,10 +77,12 @@ define([
 
         return {
 
-            constructor : function() {
+            constructor : function(world,SCALE) {
                 if(!(this instanceof Stage)) {
-                    return new Stage();
+                    return new Stage(world,SCALE);
                 }
+                this.world = world;
+                this.SCALE = SCALE;
             },
 
             init: function() {
@@ -117,7 +119,7 @@ define([
             },
 
             getBounds : function() {
-                return canvas.getBounds();;
+                return canvas.getBounds();
             },
 
             getKeys : function() {
@@ -130,6 +132,14 @@ define([
 
             update : function(updTime) {
                 this.updateGameElements(updTime);
+                var frameRate = 1/60;
+                this.world.Step(
+                  frameRate,
+                  8, // velocity iterations
+                  3  // position iterations
+                );
+                this.world.DrawDebugData();
+                this.world.ClearForces();
             },
 
             render : function(time) {
@@ -145,7 +155,7 @@ define([
                     if(!!gameElements[i]) {
                         gameElements[i].update(updTime);
                         this.correctPosition(gameElements[i]);
-                        this.detectCollisions(gameElements[i]);
+                        // this.detectCollisions(gameElements[i]);
                     }
                 }
             },
@@ -162,11 +172,15 @@ define([
             correctPosition : function(ge) { // getionElement as arg
                 var bounds = this.getBounds();
                 if(ge) {
-                    var p = ge.get('position');
-                    if(p.x > bounds.x2) { p.x = bounds.x1; }
-                    if(p.y > bounds.y2) { p.y = bounds.y1; }
-                    if(p.x < bounds.x1) { p.x = bounds.x2; }
-                    if(p.y < bounds.y1) { p.y = bounds.y2; }
+                    var body = ge.get('body');
+                    var op = body.GetPosition();
+                    var x = op.x * this.SCALE;
+                    var y = op.y * this.SCALE;
+                    
+                    if(x > bounds.x2) { body.SetPosition(new Box2D.Common.Math.b2Vec2(bounds.x1/this.SCALE,op.y)); }
+                    if(y > bounds.y2) { body.SetPosition(new Box2D.Common.Math.b2Vec2(op.x,bounds.y1/this.SCALE)); }
+                    if(x < bounds.x1) { body.SetPosition(new Box2D.Common.Math.b2Vec2(bounds.x2/this.SCALE,op.y)); }
+                    if(y < bounds.y1) { body.SetPosition(new Box2D.Common.Math.b2Vec2(op.x,bounds.y2/this.SCALE)); }
                 }
             },
 
@@ -200,7 +214,7 @@ define([
                 
             },
 
-            getNumOfGameElements : function  () {
+            getNumOfGameElements : function() {
                 return gameElements.length;
             },
 

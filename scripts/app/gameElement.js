@@ -12,10 +12,11 @@ function(_,my,util) {
         'minSpeed' : 'motionElement.minSpeed',
         'collisionRadius' : 'motionElement.collisionRadius',
         'motionElement' : 'motionElement',
-        'behavior' : 'behavior'
+        'behavior' : 'behavior',
+        'body' : 'motionElement.body'
     },
 
-        GameElement = my.Class({
+    GameElement = my.Class({
 
         constructor : function(conf) {
             if(!(this instanceof GameElement)) {

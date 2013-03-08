@@ -13,16 +13,19 @@ body {
     font-family:monospace;
     font-size:62.5%;
     background:#111111;
+    background:url(../gfx/tile3.jpg) repeat;
+}
+
+#debugCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 100;
 }
 
 #main {
     margin:0 auto;
     width:1000px;
-}
-
-canvas {
-    background:url(../gfx/tile3.jpg) repeat;
-    border:1px solid #000;
 }
 
 #infoPanel {

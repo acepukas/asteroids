@@ -41,7 +41,7 @@ define([
 
         initialize : function() {
 
-            var canvas = $(this.tagId)[0];
+            var canvas = $(this.tagId).get(0);
             this.setCanvasSize(canvas);
 
             this.context = canvas.getContext("2d");
