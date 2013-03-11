@@ -16,7 +16,7 @@ body {
     background:url(../gfx/tile3.jpg) repeat;
 }
 
-#debugCanvas {
+#b2d-debug {
   position: absolute;
   top: 0;
   left: 0;

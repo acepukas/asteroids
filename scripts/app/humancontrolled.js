@@ -14,7 +14,7 @@ function(_,my,Vector,util){
 
             this.turnrate = (!!conf.turnrate) ?
                 util.tr(conf.turnrate) :
-                util.tr(8);
+                util.tr(2);
 
             this.engine = new Vector();
             this.readyToFire = true;
@@ -39,7 +39,7 @@ function(_,my,Vector,util){
 
             if(keys.up) {
                 // heading.combine(this.engine);
-                var force = 10000;
+                var force = 2000;
                 var angle = this.body.GetAngle();
                 var vecx = util.toCartesianX(force,angle);
                 var vecy = util.toCartesianY(force,angle);
@@ -62,9 +62,9 @@ function(_,my,Vector,util){
 
             // this.gameElement.set('direction',this.getDirection());
 
-            if(keys.space) {
-                this.fireProjectile(stage); 
-            }
+            // if(keys.space) {
+            //     this.fireProjectile(stage); 
+            // }
         },
 
         updateSpeed : function (thrustEngaged) {

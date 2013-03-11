@@ -52,7 +52,7 @@ define([
             this.friction = stage.getFriction();
 
             var fixDef = new Box2D.Dynamics.b2FixtureDef;
-            fixDef.density = 2.0;
+            fixDef.density = 1.0;
             fixDef.friction = 0.5;
             fixDef.restitution = 0.5;
             fixDef.shape = new Box2D.Collision.Shapes.b2CircleShape(this.collisionRadius);
@@ -71,11 +71,11 @@ define([
 
             if(this.type === 'asteroid') {
               // apply initial force
-              var sp = 10; // speed
+              var sp = 5; // speed
               var vecx = util.toCartesianX(sp,this.direction);
               var vecy = util.toCartesianY(sp,this.direction);
               body.SetLinearVelocity(new Box2D.Common.Math.b2Vec2(vecx,vecy),body.GetWorldCenter());
-              body.SetAngularVelocity(util.tr(-45));
+              body.SetAngularVelocity(util.tr(-12));
             }
         },
 

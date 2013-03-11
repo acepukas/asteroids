@@ -1,6 +1,6 @@
 /*global define:true */
 
-define(['app/stage','app/gameelementfactory','jquery'],
+define(['app/stage','app/gameelementfactory','jquery','Box2D'],
 function(Stage,GameElementFactory) {
 
     var SCALE = 10, // scale for Box2D world

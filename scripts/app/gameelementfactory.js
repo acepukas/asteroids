@@ -82,7 +82,7 @@ define(
             return this.generateGameElement([
                 {name:'motionElement',construct:MotionElement,compProps:{maxSpeed:15,minSpeed:1.9,mass:500}},
                 {name:'shape',construct:Ship,compProps:{scale:2}},
-                {name:'behavior',construct:HumanControlled,compProps:{turnrate:8}}
+                {name:'behavior',construct:HumanControlled,compProps:{turnrate:10}}
             ]);
 
         },
