@@ -1,34 +1,26 @@
 /*global define:true */
 
-define(['app/stage','app/gameelementfactory','jquery','Box2D'],
-function(Stage,GameElementFactory) {
-
-    var SCALE = 10, // scale for Box2D world
-        gravity = new Box2D.Common.Math.b2Vec2(0,0),
-        world = new Box2D.Dynamics.b2World(gravity,true), // Box2D world
-        debugDraw = new Box2D.Dynamics.b2DebugDraw(),
-        debugCanvas = $('#debugCanvas'),
-        debugCanvasRaw = debugCanvas.get(0);
-
-    debugCanvasRaw.width=$(window).width();
-    debugCanvasRaw.height=$(window).height();
-
-    debugDraw.SetSprite(debugCanvas.get(0).getContext('2d'));
-    debugDraw.SetDrawScale(SCALE);
-    debugDraw.SetFillAlpha(0.3);
-    debugDraw.SetLineThickness(1.0);
-    debugDraw.SetFlags(Box2D.Dynamics.b2DebugDraw.e_shapeBit,Box2D.Dynamics.b2DebugDraw.e_jointBit);
-    world.SetDebugDraw(debugDraw);
+define(['app/stage','app/gameelementfactory','app/physics','jquery'],
+function(Stage,GameElementFactory,Physics) {
 
     return {
         start : function(){
-            var stage = new Stage(world,SCALE);
-            var maxObjs = 20;
+
+            var physics = new Physics({
+                  gravity: {x:0,y:0},
+                  scale: 10,
+                  debug: true
+                }),
+
+                stage = new Stage(physics),
+                maxObjs = 20,
+                gef;
+
             stage.init();
-            var gef = new GameElementFactory({
+
+            gef = new GameElementFactory({
               'stage':stage,
-              'world':world,
-              'SCALE':SCALE
+              'physics':physics
             });
 
             var ge = gef.createElement({

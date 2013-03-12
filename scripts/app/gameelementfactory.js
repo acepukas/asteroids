@@ -55,8 +55,7 @@ define(
                 conf.init = function(gameElement) {
                     this.compProps.gameElement = gameElement;
                     this.compProps.gameElementFactory = that;
-                    this.compProps.world = config.world;
-                    this.compProps.SCALE = config.SCALE;
+                    this.compProps.physics = config.physics;
                     return new conf.construct(conf.compProps);
                 };
             });
@@ -70,7 +69,7 @@ define(
                 ge = new GameElement({
                     gameElementFactory : that,
                     stage : config.stage,
-                    world : config.world,
+                    physics : config.physics,
                     'components' : c
                 });
 
@@ -90,7 +89,7 @@ define(
         createAsteroid : function() {
             
             return this.generateGameElement([
-                {name:'motionElement',construct:MotionElement,compProps:{direction:util.tr(util.randRange(0,360)),minSpeed:util.randRange(10,200)/100,maxSpeed:2,mass:10000,type:'asteroid'}},
+                {name:'motionElement',construct:MotionElement,compProps:{direction:util.randRange(0,360),minSpeed:util.randRange(10,200)/100,maxSpeed:2,mass:10000,type:'asteroid'}},
                 {name:'shape',construct:Asteroid,compProps:{scale:1}},
                 {name:'behavior',construct:AsteroidBehavior,compProps:{}}
             ]);

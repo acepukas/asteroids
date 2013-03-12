@@ -22,6 +22,7 @@ function(_,my,Vector,util){
             this.thrust = 0.3;
 
             this.body = this.gameElement.get('body');
+            this.physics = this.gameElement.get('physics');
 
         },
 
@@ -43,7 +44,7 @@ function(_,my,Vector,util){
                 var angle = this.body.GetAngle();
                 var vecx = util.toCartesianX(force,angle);
                 var vecy = util.toCartesianY(force,angle);
-                this.body.ApplyForce(new Box2D.Common.Math.b2Vec2(vecx,vecy),this.body.GetWorldCenter());
+                this.body.ApplyForce(this.physics.b2Vec2(vecx,vecy),this.body.GetWorldCenter());
             }
 
             if(keys.left) {

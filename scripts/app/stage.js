@@ -77,12 +77,11 @@ define([
 
         return {
 
-            constructor : function(world,SCALE) {
+            constructor : function(physics) {
                 if(!(this instanceof Stage)) {
-                    return new Stage(world,SCALE);
+                    return new Stage(physics);
                 }
-                this.world = world;
-                this.SCALE = SCALE;
+                this.physics = physics;
             },
 
             init: function() {
@@ -132,14 +131,18 @@ define([
 
             update : function(updTime) {
                 this.updateGameElements(updTime);
-                var frameRate = 1/60;
-                this.world.Step(
+                var world = this.physics.getWorld(),
+                    frameRate = 1/60;
+
+                // run physics simulation
+                world.Step(
                   frameRate,
                   8, // velocity iterations
                   3  // position iterations
                 );
-                this.world.DrawDebugData();
-                this.world.ClearForces();
+
+                world.DrawDebugData();
+                world.ClearForces();
             },
 
             render : function(time) {
@@ -172,15 +175,16 @@ define([
             correctPosition : function(ge) { // getionElement as arg
                 var bounds = this.getBounds();
                 if(ge) {
-                    var body = ge.get('body');
-                    var op = body.GetPosition();
-                    var x = op.x * this.SCALE;
-                    var y = op.y * this.SCALE;
+                    var body = ge.get('body'),
+                        op = body.GetPosition(),
+                        scale = this.physics.getScale(),
+                        x = op.x * scale,
+                        y = op.y * scale;
                     
-                    if(x > bounds.x2) { body.SetPosition(new Box2D.Common.Math.b2Vec2(bounds.x1/this.SCALE,op.y)); }
-                    if(y > bounds.y2) { body.SetPosition(new Box2D.Common.Math.b2Vec2(op.x,bounds.y1/this.SCALE)); }
-                    if(x < bounds.x1) { body.SetPosition(new Box2D.Common.Math.b2Vec2(bounds.x2/this.SCALE,op.y)); }
-                    if(y < bounds.y1) { body.SetPosition(new Box2D.Common.Math.b2Vec2(op.x,bounds.y2/this.SCALE)); }
+                    if(x > bounds.x2) { body.SetPosition(this.physics.b2Vec2(bounds.x1/scale,op.y)); }
+                    if(y > bounds.y2) { body.SetPosition(this.physics.b2Vec2(op.x,bounds.y1/scale)); }
+                    if(x < bounds.x1) { body.SetPosition(this.physics.b2Vec2(bounds.x2/scale,op.y)); }
+                    if(y < bounds.y1) { body.SetPosition(this.physics.b2Vec2(op.x,bounds.y2/scale)); }
                 }
             },
 
@@ -230,7 +234,7 @@ define([
                     heading = main.get('heading');
                 
                 consoleData.infoItems.push({label:el + ' Position',value:pos});
-                consoleData.infoItems.push({label:el + ' Heading',value:heading});
+                // consoleData.infoItems.push({label:el + ' Heading',value:heading});
                 // consoleData.infoItems.push({label:'fps',value:this.getFps()});
                 infoPanel.html(infoPanelTemplate(consoleData));
             }

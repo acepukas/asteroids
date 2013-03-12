@@ -1,7 +1,7 @@
 /*global define:true, my:true */
 
-define(['myclass','jquery','Box2D'],
-function(my) {
+define(['myclass','app/util','jquery','Box2D'],
+function(my,util) {
 
   // abbreviations for common Box2D classes/vars
   var b2Vec2 = Box2D.Common.Math.b2Vec2,
@@ -26,6 +26,7 @@ function(my) {
       }
 
       this.config = config;
+      this.initialize();
     },
 
     initialize : function() {
@@ -93,13 +94,13 @@ function(my) {
           bodyTypes = {
             'dynamic': b2_dynamicBody,
             'static': b2_staticBody,
-            'kinematic' b2_kinematicBody
+            'kinematic': b2_kinematicBody
           };
 
       fixDef = new b2FixtureDef();
-      fixDef.density = this.density;
-      fixDef.friction = this.friction;
-      fixDef.restitution = this.restitution;
+      fixDef.density = config.density || this.density;
+      fixDef.friction = config.friction || this.friction;
+      fixDef.restitution = config.restitution || this.restitution;
 
       if(config.shapeType === 'circle') {
 
@@ -130,7 +131,7 @@ function(my) {
       position = config.position || {x:0,y:0};
       bodyDef.position.x = (position.x||0)/this.scale;
       bodyDef.position.y = (position.y||0)/this.scale;
-      bodyDef.angle = config.direction || 0;
+      bodyDef.angle = util.tr(config.angle || 0);
 
       body = this.world.CreateBody(bodyDef);
       body.CreateFixture(fixDef);
@@ -148,6 +149,10 @@ function(my) {
       }
 
       return body;
+    },
+
+    b2Vec2 : function(x,y) {
+      return new b2Vec2(x,y);
     }
 
   });

@@ -4,16 +4,17 @@ define(['underscore','myclass','app/util'],
 function(_,my,util) {
 
     var componentMap = {
-        'stage' : 'stage',
-        'className' : 'className',
-        'heading' : 'motionElement.heading',
-        'position' : 'motionElement.position',
-        'direction' : 'motionElement.direction',
-        'minSpeed' : 'motionElement.minSpeed',
+        'stage'           : 'stage',
+        'className'       : 'className',
+        'motionElement'   : 'motionElement',
+        'heading'         : 'motionElement.heading',
+        'position'        : 'motionElement.position',
+        'direction'       : 'motionElement.direction',
+        'minSpeed'        : 'motionElement.minSpeed',
         'collisionRadius' : 'motionElement.collisionRadius',
-        'motionElement' : 'motionElement',
-        'behavior' : 'behavior',
-        'body' : 'motionElement.body'
+        'body'            : 'motionElement.body',
+        'behavior'        : 'behavior',
+        'physics'         : 'physics'
     },
 
     GameElement = my.Class({
