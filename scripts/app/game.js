@@ -24,6 +24,7 @@ function(Stage,Physics,ActorFactory) {
             });
 
             var ship = af.createActor({
+              actorType: 'ship',
               position: stage.getCenterPoint(),
               angle: 0,
               radius: 5

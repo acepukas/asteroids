@@ -5,7 +5,7 @@ function(my,util,_) {
 
   var attributes = {},
 
-      Actor = my.Class({
+  Actor = my.Class({
 
     constructor : function(config) {
       if(!(this instanceof Actor)) {
@@ -29,26 +29,26 @@ function(my,util,_) {
         position: attributes.position,
         angle: attributes.angle,
         radius: attributes.radius
-      }
+      };
 
       this.body = attributes.physics.createBody(bodyConfig);
 
       // create vector graphic
-      var vectorStates = {
-        'default':{
-          'points':util.generateCircPoints(8,attributes.radius*this.scale),
-          'scale':attributes.drawScale || 1,
-          'drawStyles':{
-            'lineWidth':3.0,
-            'lineCap':'round',
-            'lineJoin':'round',
-            'strokeStyle':'#111',
-            'fillStyle':'#666666'
+      if(!attributes.states) {
+        attributes.states = {
+          'default':{
+            'points':util.generateCircPoints(8,attributes.radius*this.scale),
+            'scale':attributes.drawScale || 1,
+            'drawStyles':{
+              'lineWidth':3.0,
+              'lineCap':'round',
+              'lineJoin':'round',
+              'strokeStyle':'#111',
+              'fillStyle':'#666666'
+            }
           }
-        }
-      };
-
-      this.setStates(vectorStates);
+        };
+      }
 
     },
 
@@ -70,8 +70,8 @@ function(my,util,_) {
     render : function() {
       var canvas = attributes.stage.getCanvas();
       canvas.drawShape(_.extend({
-          direction: attributes.angle,
-          position: attributes.position
+        direction: attributes.angle,
+        position: attributes.position
       },attributes.states[attributes.state]));
     }
 

@@ -1,13 +1,13 @@
 /*global define:true, my:true */
 
-define(['myclass','underscore','app/util','app/actor'],
-function(my,_,util,Actor) {
+define(['myclass','underscore','app/util','app/actor','app/ship'],
+function(my,_,util,Actor,Ship) {
 
   var attributes = {},
       
       actorTypes = {
         'Actor':Actor
-      // , 'Ship':Ship
+      , 'Ship':Ship
       // , 'Asteroid':Asteroid
       // , 'Projectile':Projectile
       },
