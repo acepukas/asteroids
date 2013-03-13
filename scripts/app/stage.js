@@ -5,13 +5,15 @@ define([
     'jquery',
     'handlebars',
     'app/canvaswrapper',
-    'app/util'
+    'app/util',
+    'app/point'
 ], function(
     my,
     $,
     Handlebars,
     CanvasWrapper,
-    util
+    util,
+    Point
 ){
 
     var Stage = my.Class((function () {
@@ -36,14 +38,14 @@ define([
             // stores 
             time = 0,
 
-            // global friction
-            friction = 1.5,
-
             // canvas context object
             canvas = null,
 
+            // Box2D physics object
+            physics,
+
             // stores a list of motion objects
-            gameElements = [],
+            actors = [],
 
             // speed for logic loop which runs 
             // independently of animation loop
@@ -77,14 +79,11 @@ define([
 
         return {
 
-            constructor : function(physics) {
+            constructor : function(config) {
                 if(!(this instanceof Stage)) {
-                    return new Stage(physics);
+                    return new Stage(config);
                 }
-                this.physics = physics;
-            },
-
-            init: function() {
+                physics = config.physics;
                 canvas = new CanvasWrapper('#canvas');
             },
 
@@ -109,6 +108,10 @@ define([
                 return canvas;
             },
 
+            getPhysics : function() {
+              return physics;
+            },
+
             getTime : function() {
                 return time;
             },
@@ -125,13 +128,9 @@ define([
                 return keys;
             },
 
-            getFriction : function() {
-                return friction;
-            },
-
             update : function(updTime) {
-                this.updateGameElements(updTime);
-                var world = this.physics.getWorld(),
+                this.updateActors(updTime);
+                var world = physics.getWorld(),
                     frameRate = 1/60;
 
                 // run physics simulation
@@ -148,48 +147,48 @@ define([
             render : function(time) {
                 this.setTime(time);
                 canvas.clear();
-                this.renderGameElements();
-                this.updateInfoPanel();
+                this.renderActors();
+                // this.updateInfoPanel();
             },
 
-            updateGameElements : function(updTime) {
-                var i = gameElements.length;
+            updateActors : function(updTime) {
+                var i = actors.length;
                 while(i--) {
-                    if(!!gameElements[i]) {
-                        gameElements[i].update(updTime);
-                        this.correctPosition(gameElements[i]);
-                        // this.detectCollisions(gameElements[i]);
+                    if(!!actors[i]) {
+                        actors[i].update(updTime);
+                        this.correctPosition(actors[i]);
+                        // this.detectCollisions(actors[i]);
                     }
                 }
             },
 
-            renderGameElements : function() {
-                var i = gameElements.length;
+            renderActors : function() {
+                var i = actors.length;
                 while(i--) {
-                    if(!!gameElements[i]) {
-                        gameElements[i].render();
+                    if(!!actors[i]) {
+                        actors[i].render();
                     }
                 }
             },
 
-            correctPosition : function(ge) { // getionElement as arg
+            correctPosition : function(actor) { // getionElement as arg
                 var bounds = this.getBounds();
-                if(ge) {
-                    var body = ge.get('body'),
+                if(actor) {
+                    var body = actor.body,
                         op = body.GetPosition(),
-                        scale = this.physics.getScale(),
+                        scale = physics.getScale(),
                         x = op.x * scale,
                         y = op.y * scale;
                     
-                    if(x > bounds.x2) { body.SetPosition(this.physics.b2Vec2(bounds.x1/scale,op.y)); }
-                    if(y > bounds.y2) { body.SetPosition(this.physics.b2Vec2(op.x,bounds.y1/scale)); }
-                    if(x < bounds.x1) { body.SetPosition(this.physics.b2Vec2(bounds.x2/scale,op.y)); }
-                    if(y < bounds.y1) { body.SetPosition(this.physics.b2Vec2(op.x,bounds.y2/scale)); }
+                    if(x > bounds.x2) { body.SetPosition(physics.b2Vec2(bounds.x1/scale,op.y)); }
+                    if(y > bounds.y2) { body.SetPosition(physics.b2Vec2(op.x,bounds.y1/scale)); }
+                    if(x < bounds.x1) { body.SetPosition(physics.b2Vec2(bounds.x2/scale,op.y)); }
+                    if(y < bounds.y1) { body.SetPosition(physics.b2Vec2(op.x,bounds.y2/scale)); }
                 }
             },
 
             detectCollisions : function(ge) {
-                _.each(gameElements,function(item) {
+                _.each(actors,function(item) {
                     if(!item || !ge) return;
 
                     if(item !== ge) {
@@ -203,32 +202,41 @@ define([
                 });
             },
 
-            addGameElement : function(ge) {
-                gameElements.push(ge);
+            addActor : function(ge) {
+                actors.push(ge);
             },
 
-            removeGameElement : function(ge) {
-                var i = gameElements.length;
+            removeActor : function(ge) {
+                var i = actors.length;
 
                 while(i--) {
-                    if(gameElements[i] === ge) {
-                        gameElements.splice(i,1); 
+                    if(actors[i] === ge) {
+                        actors.splice(i,1); 
                     }
                 }
                 
             },
 
-            getNumOfGameElements : function() {
-                return gameElements.length;
+            getNumOfActors : function() {
+                return actors.length;
             },
 
             getFps : function() {
                 return util.round(1000/(Date.now()-this.getTime()),0);
             },
 
+            getCenterPoint : function() {
+              var bounds = this.getBounds(),
+                  x = bounds.x2/2,
+                  y = bounds.y2/2,
+                  point = new Point(x,y);
+
+              return point;
+            },
+
             updateInfoPanel : function() {
                 consoleData.infoItems = [];
-                var main = gameElements[0],
+                var main = actors[0],
                     el = main.get('className'),
                     pos = main.get('position'),
                     heading = main.get('heading');

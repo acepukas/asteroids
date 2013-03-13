@@ -1,7 +1,7 @@
 /*global define:true */
 
-define(['app/stage','app/gameelementfactory','app/physics','jquery'],
-function(Stage,GameElementFactory,Physics) {
+define(['app/stage','app/physics','app/actorfactory','jquery'],
+function(Stage,Physics,ActorFactory) {
 
     return {
         start : function(){
@@ -12,39 +12,24 @@ function(Stage,GameElementFactory,Physics) {
                   debug: true
                 }),
 
-                stage = new Stage(physics),
+                stage = new Stage({
+                  'physics':physics
+                }),
+
                 maxObjs = 20,
-                gef;
+                af;
 
-            stage.init();
-
-            gef = new GameElementFactory({
-              'stage':stage,
-              'physics':physics
+            af = new ActorFactory({
+              'stage':stage
             });
 
-            var ge = gef.createElement({
-                type:'ship'
+            var ship = af.createActor({
+              position: stage.getCenterPoint(),
+              angle: 0,
+              radius: 5
             });
-            stage.addGameElement(ge);
 
-            var addAsteroid = function() {
-                if(stage.getNumOfGameElements() < maxObjs) {
-                    var asteroid = gef.createElement({
-                        type:'asteroid'
-                    });
-                    stage.addGameElement(asteroid);
-                }
-            };
-
-            var i = 0, l = maxObjs;
-            for(i=0;i<l;i+=1) {
-                addAsteroid();
-            }
-
-            setInterval(function() {
-                addAsteroid();
-            },1000);
+            stage.addActor(ship);
 
             stage.initAnim();
         }
