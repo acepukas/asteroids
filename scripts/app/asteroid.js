@@ -1,61 +1,46 @@
-/*global define:true, my:true */
-define([
-    'myclass',
-    'underscore',
-    'app/shape',
-    'app/util'
-] , function(
-    my,
-    _,
-    Shape,
-    util
-) {
+/*global define:true, my:true  */
 
-    var config = {},
-    
-        Asteroid = my.Class(Shape,{
+define(['underscore','myclass','app/actor','app/util'],
+function(_,my,Actor,util) {
 
-        constructor : function(conf) {
-            if(!(this instanceof Asteroid)) {
-                return new Asteroid(conf);
-            }
+  Asteroid = my.Class(Actor,{
 
-            config = conf;
+    constructor : function(config) {
+      if(!(this instanceof Asteroid)) {
+          return new Asteroid(config);
+      }
 
-            var points = util.generateCircPoints(8,60);
+      this.attributes = {},
+      this.attributes = _.extend(this.attributes,config);
 
-            var i = 0, l = points.length;
-            for(i=0;i<l;i+=1) {
-                points[i].x += (util.randRange(30) - 15);
-                points[i].y += (util.randRange(30) - 15);
-            }
+      var points = util.generateCircPoints(8,this.attributes.radius);
 
-            var states = {
-                'default':{
-                    'points':points,
-                    'scale':config.scale,
-                    'drawStyles':{
-                        'lineWidth':9.0,
-                        'lineCap':'round',
-                        'lineJoin':'round',
-                        'strokeStyle':'#222',
-                        'fillStyle':'#333'
-                    }
-                }
-            };
+      var i = 0, l = points.length;
+      for(i=0;i<l;i+=1) {
+          points[i].x += util.randRange(-2,2);
+          points[i].y += util.randRange(-2,2);
+      }
 
-            this.state = 'default';
-
-            Asteroid.Super.call(this,{
-                'states':states,
-                gameElement:config.gameElement
-            });
-
+      this.attributes.states = {
+        'default':{
+          'points':points,
+          'scale':this.attributes.drawScale || 10,
+          'drawStyles':{
+            'lineWidth':9.0,
+            'lineCap':'round',
+            'lineJoin':'round',
+            'strokeStyle':'#222',
+            'fillStyle':'#333'
+          }
         }
+      };
 
-    });
+      Asteroid.Super.call(this,this.attributes);
+    }
 
-    return Asteroid;
+  });
+
+  return Asteroid;
 
 });
 

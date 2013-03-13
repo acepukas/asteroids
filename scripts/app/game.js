@@ -1,39 +1,49 @@
 /*global define:true */
 
-define(['app/stage','app/physics','app/actorfactory','jquery'],
-function(Stage,Physics,ActorFactory) {
+define(['app/stage','app/actorfactory','app/util'],
+function(Stage,ActorFactory,util) {
 
-    return {
-        start : function(){
+  var stage = new Stage();
 
-            var physics = new Physics({
-                  gravity: {x:0,y:0},
-                  scale: 10,
-                  debug: true
-                }),
+  return {
+    start : function(){
+      this.addShip();
 
-                stage = new Stage({
-                  'physics':physics
-                }),
+      // adding asteroids
+      var i = 0, l = 10;
+      for(i=0;i<l;i+=1) {
+        this.addAsteroid();
+      }
 
-                maxObjs = 20,
-                af;
+      stage.initAnim();
+    },
 
-            af = new ActorFactory({
-              'stage':stage
-            });
+    addAsteroid : function() {
+      var bnds = stage.getBounds(),
+          position = {
+            x: util.randRange(bnds.x1,bnds.x2),
+            y: util.randRange(bnds.y1,bnds.y2)
+          },
+          angularVelocity = 15;
 
-            var ship = af.createActor({
-              actorType: 'ship',
-              position: stage.getCenterPoint(),
-              angle: 0,
-              radius: 5
-            });
+      stage.createActor({
+        actorType: 'asteroid',
+        position: position,
+        angle: util.randRange(0,360),
+        initialForce: util.randRange(10,20),
+        angularVelocity: util.randRange(-angularVelocity,angularVelocity),
+        radius: 5
+      });
+    },
 
-            stage.addActor(ship);
-
-            stage.initAnim();
-        }
-    };
+    addShip : function() {
+      stage.createActor({
+        actorType: 'ship',
+        position: stage.getCenterPoint(),
+        angle: 0,
+        radius: 4
+      });
+    }
+  };
 
 });

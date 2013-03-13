@@ -3,8 +3,6 @@
 define(['underscore','myclass','app/actor','app/util'],
 function(_,my,Actor,util) {
 
-  var attributes = {},
-
   Ship = my.Class(Actor,{
 
     constructor : function(config) {
@@ -12,11 +10,10 @@ function(_,my,Actor,util) {
           return new Ship(config);
       }
 
-      attributes = _.extend(attributes,config);
+      this.attributes = {},
+      this.attributes = _.extend(this.attributes,config);
 
-      attributes.state = 'default';
-
-      attributes.states = {
+      this.attributes.states = {
         'default':{
           'points':[
             {x:-20, y:  0}, // tail
@@ -26,7 +23,7 @@ function(_,my,Actor,util) {
             {x: -2, y:-15},
             {x:-10, y:-15}
           ],
-          'scale':attributes.drawScale || 2,
+          'scale':this.attributes.drawScale || 2,
           'drawStyles':{
             'lineWidth':3.0,
             'lineCap':'round',
@@ -37,38 +34,38 @@ function(_,my,Actor,util) {
         }
       };
 
-      attributes.readyToFire = true;
-      attributes.firingRate = 1000/6;
-      attributes.force = 10000;
-      attributes.turnrate = (!!attributes.turnrate) ?
-        util.tr(attributes.turnrate) :
+      this.attributes.readyToFire = true;
+      this.attributes.firingRate = 1000/6;
+      this.attributes.force = 10000;
+      this.attributes.turnrate = (!!this.attributes.turnrate) ?
+        util.tr(this.attributes.turnrate) :
         util.tr(6);
-      
-      Ship.Super.call(this,attributes);
+
+      Ship.Super.call(this,this.attributes);
     },
 
     update : function() {
 
-      var keys = attributes.stage.getKeys(),
+      var keys = this.attributes.stage.getKeys(),
           localVector,
           worldVector,
           angle;
 
       if(keys.up) {
-        localVector = attributes.physics.b2Vec2(attributes.force,0);
+        localVector = this.attributes.physics.b2Vec2(this.attributes.force,0);
         worldVector = this.body.GetWorldVector(localVector);
         this.body.ApplyForce(worldVector,this.body.GetWorldCenter());
       }
 
       if(keys.left) {
         angle = this.body.GetAngle();
-        angle = this.adjustDirection(angle,-attributes.turnrate);
+        angle = this.adjustDirection(angle,-this.attributes.turnrate);
         this.body.SetAngle(angle);
       }
 
       if(keys.right) {
         angle = this.body.GetAngle();
-        angle = this.adjustDirection(angle,attributes.turnrate);
+        angle = this.adjustDirection(angle,this.attributes.turnrate);
         this.body.SetAngle(angle);
       }
 

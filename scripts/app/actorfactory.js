@@ -1,17 +1,14 @@
 /*global define:true, my:true */
 
-define(['myclass','underscore','app/util','app/actor','app/ship'],
-function(my,_,util,Actor,Ship) {
+define(['myclass','underscore','app/util','app/actor','app/ship','app/asteroid'],
+function(my,_,util,Actor,Ship,Asteroid) {
 
-  var attributes = {},
-      
-      actorTypes = {
-        'Actor':Actor
-      , 'Ship':Ship
-      // , 'Asteroid':Asteroid
-      // , 'Projectile':Projectile
-      },
-
+  var actorTypes = {
+    'Actor':Actor
+  , 'Ship':Ship
+  , 'Asteroid':Asteroid
+  // , 'Projectile':Projectile
+  },
 
   ActorFactory = my.Class({
 
@@ -20,15 +17,11 @@ function(my,_,util,Actor,Ship) {
         return new ActorFactory(config);
       }
 
-      attributes = _.extend(attributes,config);
+      this.attributes = {},
+      this.attributes = _.extend(this.attributes,config);
 
-      attributes.physics = attributes.stage.getPhysics();
-      this.initialize();
-
-    },
-
-    initialize : function() {
-    
+      // expose physics object
+      this.attributes.physics = this.attributes.stage.getPhysics();
     },
 
     createActor : function(config) {
@@ -36,9 +29,9 @@ function(my,_,util,Actor,Ship) {
       
       if(!(type in actorTypes)) return null;
 
-      config = _.extend(config,attributes);
+      config = _.extend(config,this.attributes);
 
-      // TODO: attach common default attributes to actors here for convenience
+      // TODO: attach common default this.attributes to actors here for convenience
 
       return actorTypes[type](config);
     }

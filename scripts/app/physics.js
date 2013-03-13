@@ -136,18 +136,6 @@ function(my,util) {
       body = this.world.CreateBody(bodyDef);
       body.CreateFixture(fixDef);
 
-      // FIXME: These if statements should be moved to the
-      // body wrapper base class
-      if(!!config.initialForce) {
-        var vecx = util.toCartesianX(config.initialForce,bodyDef.angle);
-        var vecy = util.toCartesianY(config.initialForce,bodyDef.angle);
-        body.SetLinearVelocity(new b2Vec2(vecx,vecy),body.GetWorldCenter());
-      }
-
-      if(!!config.angularVelocity) {
-        body.SetAngularVelocity(util.tr(config.angularVelocity));
-      }
-
       return body;
     },
 

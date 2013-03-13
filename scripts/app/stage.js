@@ -6,14 +6,18 @@ define([
     'handlebars',
     'app/canvaswrapper',
     'app/util',
-    'app/point'
+    'app/point',
+    'app/actorfactory',
+    'app/physics'
 ], function(
     my,
     $,
     Handlebars,
     CanvasWrapper,
     util,
-    Point
+    Point,
+    ActorFactory,
+    Physics
 ){
 
     var Stage = my.Class((function () {
@@ -62,7 +66,9 @@ define([
 
             renderInterval = null,
 
-            gameLoopInterval = null;
+            gameLoopInterval = null,
+
+            actorFactory = null;
 
         // set up key event listeners
         $(document).keydown(function(e) {
@@ -79,11 +85,17 @@ define([
 
         return {
 
-            constructor : function(config) {
+            constructor : function() {
                 if(!(this instanceof Stage)) {
-                    return new Stage(config);
+                    return new Stage();
                 }
-                physics = config.physics;
+
+                physics = new Physics({
+                  gravity: {x:0,y:0},
+                  scale: 10
+                  , debug: true
+                });
+                actorFactory = new ActorFactory({'stage':this});
                 canvas = new CanvasWrapper('#canvas');
             },
 
@@ -232,6 +244,10 @@ define([
                   point = new Point(x,y);
 
               return point;
+            },
+
+            createActor : function(config) {
+              this.addActor(actorFactory.createActor(config));
             },
 
             updateInfoPanel : function() {

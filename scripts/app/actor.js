@@ -3,8 +3,6 @@
 define(['myclass','app/util','underscore'],
 function(my,util,_) {
 
-  var attributes = {},
-
   Actor = my.Class({
 
     constructor : function(config) {
@@ -12,33 +10,44 @@ function(my,util,_) {
         return new Actor(config);
       }
 
-      attributes = _.extend(attributes,config);
+      this.attributes = {},
+      this.attributes = _.extend(this.attributes,config);
       this.initialize();
     },
 
     initialize : function() {
 
-      this.scale = attributes.physics.getScale();
+      this.scale = this.attributes.physics.getScale();
 
-      attributes.state = 'default';
+      this.attributes.state = 'default';
 
       // create Box2D body object
       var bodyConfig = {
         shapeType: 'circle',
         bodyType: 'dynamic',
-        position: attributes.position,
-        angle: attributes.angle,
-        radius: attributes.radius
+        position: this.attributes.position,
+        angle: this.attributes.angle,
+        radius: this.attributes.radius
       };
 
-      this.body = attributes.physics.createBody(bodyConfig);
+      this.body = this.attributes.physics.createBody(bodyConfig);
+
+      if(!!this.attributes.initialForce) {
+        var localVector = this.attributes.physics.b2Vec2(this.attributes.initialForce,0),
+            worldVector = this.body.GetWorldVector(localVector);
+        this.body.SetLinearVelocity(worldVector,this.body.GetWorldCenter());
+      }
+
+      if(!!this.attributes.angularVelocity) {
+        this.body.SetAngularVelocity(util.tr(this.attributes.angularVelocity));
+      }
 
       // create vector graphic
-      if(!attributes.states) {
-        attributes.states = {
+      if(!this.attributes.states) {
+        this.attributes.states = {
           'default':{
-            'points':util.generateCircPoints(8,attributes.radius*this.scale),
-            'scale':attributes.drawScale || 1,
+            'points':util.generateCircPoints(8,this.attributes.radius*this.scale),
+            'scale':this.attributes.drawScale || 1,
             'drawStyles':{
               'lineWidth':3.0,
               'lineCap':'round',
@@ -54,25 +63,25 @@ function(my,util,_) {
 
     update : function() {
       var bpos = this.body.GetPosition();
-      attributes.position.x = bpos.x * this.scale;
-      attributes.position.y = bpos.y * this.scale;
-      attributes.angle = this.body.GetAngle();
+      this.attributes.position.x = bpos.x * this.scale;
+      this.attributes.position.y = bpos.y * this.scale;
+      this.attributes.angle = this.body.GetAngle();
     },
 
     setStates : function(states) {
-      attributes.states = states;
+      this.attributes.states = states;
     },
 
     getStates : function() {
-      return attributes.states;
+      return this.attributes.states;
     },
 
     render : function() {
-      var canvas = attributes.stage.getCanvas();
+      var canvas = this.attributes.stage.getCanvas();
       canvas.drawShape(_.extend({
-        direction: attributes.angle,
-        position: attributes.position
-      },attributes.states[attributes.state]));
+        direction: this.attributes.angle,
+        position: this.attributes.position
+      },this.attributes.states[this.attributes.state]));
     }
 
   });
