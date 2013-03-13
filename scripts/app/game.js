@@ -15,6 +15,17 @@ function(Stage,ActorFactory,util) {
         this.addAsteroid();
       }
 
+      stage.setContactListeners({
+        BeginContact : function(contact) {
+          var a = contact.GetFixtureA().GetBody().GetUserData(),
+              b = contact.GetFixtureB().GetBody().GetUserData();
+              
+          if(a === 'ship' || b === 'ship') {
+            console.info('ship collided');
+          }
+        }
+      });
+
       stage.initAnim();
     },
 

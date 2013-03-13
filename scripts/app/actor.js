@@ -27,7 +27,9 @@ function(my,util,_) {
         bodyType: 'dynamic',
         position: this.attributes.position,
         angle: this.attributes.angle,
-        radius: this.attributes.radius
+        radius: this.attributes.radius,
+        angularDamping: this.attributes.angularDamping || 0,
+        userData: this.attributes.actorType
       };
 
       this.body = this.attributes.physics.createBody(bodyConfig);

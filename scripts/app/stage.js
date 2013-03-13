@@ -250,6 +250,10 @@ define([
               this.addActor(actorFactory.createActor(config));
             },
 
+            setContactListeners : function(callbacks) {
+              physics.setContactListeners(callbacks);
+            },
+
             updateInfoPanel : function() {
                 consoleData.infoItems = [];
                 var main = actors[0],

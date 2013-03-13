@@ -36,10 +36,11 @@ function(_,my,Actor,util) {
 
       this.attributes.readyToFire = true;
       this.attributes.firingRate = 1000/6;
-      this.attributes.force = 10000;
-      this.attributes.turnrate = (!!this.attributes.turnrate) ?
-        util.tr(this.attributes.turnrate) :
-        util.tr(6);
+      this.attributes.force = 4000;
+      this.attributes.torque = (!!this.attributes.torque) ?
+        this.attributes.torque : 8000;
+
+      this.attributes.angularDamping = 1;
 
       Ship.Super.call(this,this.attributes);
     },
@@ -58,15 +59,11 @@ function(_,my,Actor,util) {
       }
 
       if(keys.left) {
-        angle = this.body.GetAngle();
-        angle = this.adjustDirection(angle,-this.attributes.turnrate);
-        this.body.SetAngle(angle);
+        this.body.ApplyTorque(-this.attributes.torque);
       }
 
       if(keys.right) {
-        angle = this.body.GetAngle();
-        angle = this.adjustDirection(angle,this.attributes.turnrate);
-        this.body.SetAngle(angle);
+        this.body.ApplyTorque(this.attributes.torque);
       }
 
       Ship.Super.prototype.update.call(this);

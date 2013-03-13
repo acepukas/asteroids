@@ -16,7 +16,8 @@ function(my,util) {
       b2DebugDraw = Box2D.Dynamics.b2DebugDraw,
       b2_dynamicBody = Box2D.Dynamics.b2Body.b2_dynamicBody,
       b2_staticBody = Box2D.Dynamics.b2Body.b2_staticBody,
-      b2_kinematicBody = Box2D.Dynamics.b2Body.b2_kinematicBody;
+      b2_kinematicBody = Box2D.Dynamics.b2Body.b2_kinematicBody,
+      b2ContactListener = Box2D.Dynamics.b2ContactListener;
 
   var Physics = my.Class({
 
@@ -132,15 +133,31 @@ function(my,util) {
       bodyDef.position.x = (position.x||0)/this.scale;
       bodyDef.position.y = (position.y||0)/this.scale;
       bodyDef.angle = util.tr(config.angle || 0);
+      bodyDef.angularDamping = config.angularDamping;
 
       body = this.world.CreateBody(bodyDef);
       body.CreateFixture(fixDef);
+
+      body.SetUserData(config.userData);
 
       return body;
     },
 
     b2Vec2 : function(x,y) {
       return new b2Vec2(x,y);
+    },
+
+    setContactListeners : function(callbacks) {
+      var listener = new b2ContactListener();
+
+      var callback = null;
+      for(callback in callbacks) {
+        if(callbacks.hasOwnProperty(callback)) {
+          listener[callback] = callbacks[callback];
+        }
+      }
+
+      this.world.SetContactListener(listener);
     }
 
   });
