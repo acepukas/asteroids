@@ -245,8 +245,10 @@ define([
       updateInfoPanel : function() {
         consoleData.infoItems = [];
         var numOfActors = actors.length;
+        var ship = actors[0];
         
         consoleData.infoItems.push({label:'Actors on Stage',value:numOfActors});
+        consoleData.infoItems.push({label:'Shields',value:ship.getShields()});
         // consoleData.infoItems.push({label:'fps',value:this.getFps()});
         infoPanel.html(infoPanelTemplate(consoleData));
       },

@@ -47,8 +47,7 @@ define([
         }
       };
 
-      this.attributes.readyToFire = true;
-      this.attributes.firingRate = 1000/6;
+      this.attributes.shields = 100;
       this.attributes.force = 4000;
       this.attributes.torque = (!!this.attributes.torque) ?
         this.attributes.torque : 8000;
@@ -57,6 +56,11 @@ define([
       this.attributes.linearDamping = 1;
 
       Ship.Super.call(this,this.attributes);
+
+      window.asteroids.events.on('collision:ship',function(e,actor) {
+        this.depleteShields();
+      },this);
+  
     },
 
     update : function() {
@@ -109,10 +113,23 @@ define([
             initialForce: this.body.GetLinearVelocity().Length() + 1000
           };
 
-      console.info(projConf);
       this.attributes.stage.createActor(projConf);
 
-    },100)
+    },100),
+
+    depleteShields : function() {
+      this.attributes.shields -= 5;
+      if(this.attributes.shields <= 0)
+        window.asteroid.events.trigger('game:gameover');
+    },
+
+    getShields : function() {
+      return this.attributes.shields;
+    },
+
+    reset : function() {
+      this.attributes.shields = 100;
+    }
 
   });
 

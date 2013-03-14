@@ -9,10 +9,6 @@ function(Stage,ActorFactory,util,CustomEvents) {
   window.asteroids = {};
   window.asteroids.events = new CustomEvents();
 
-  // window.asteroids.events.on('collision:ship',function(e,actor) {
-  //   console.info(actor);
-  // });
-  
   stage.setContactListeners({
     BeginContact : function(contact) {
       var a = contact.GetFixtureA().GetBody().GetUserData(),
