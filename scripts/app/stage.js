@@ -93,7 +93,7 @@ define([
                 physics = new Physics({
                   gravity: {x:0,y:0},
                   scale: 10
-                  , debug: true
+                  // , debug: true
                 });
                 actorFactory = new ActorFactory({'stage':this});
                 canvas = new CanvasWrapper('#canvas');

@@ -15,12 +15,6 @@ function(_,my,Actor,util) {
 
       var points = util.generateCircPoints(8,this.attributes.radius);
 
-      var i = 0, l = points.length;
-      for(i=0;i<l;i+=1) {
-          points[i].x += util.randRange(-2,2);
-          points[i].y += util.randRange(-2,2);
-      }
-
       this.attributes.states = {
         'default':{
           'points':points,

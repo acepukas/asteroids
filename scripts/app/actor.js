@@ -29,6 +29,7 @@ function(my,util,_) {
         angle: this.attributes.angle,
         radius: this.attributes.radius,
         angularDamping: this.attributes.angularDamping || 0,
+        linearDamping: this.attributes.linearDamping || 0,
         userData: this.attributes.actorType
       };
 

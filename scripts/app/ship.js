@@ -1,17 +1,30 @@
 /*global define:true, my:true  */
 
-define(['underscore','myclass','app/actor','app/util'],
-function(_,my,Actor,util) {
+define([
+  'underscore',
+  'myclass',
+  'app/actor',
+  'app/util',
+  'app/point'
+] , function(
+  _,
+  my,
+  Actor,
+  util,
+  Point
+) {
 
   Ship = my.Class(Actor,{
 
     constructor : function(config) {
       if(!(this instanceof Ship)) {
-          return new Ship(config);
+        return new Ship(config);
       }
 
       this.attributes = {},
       this.attributes = _.extend(this.attributes,config);
+
+      this.nose = new Point(40,0); 
 
       this.attributes.states = {
         'default':{
@@ -19,7 +32,7 @@ function(_,my,Actor,util) {
             {x:-20, y:  0}, // tail
             {x:-10, y: 15},
             {x: -2, y: 15},
-            {x: 40, y:  0}, // nose
+            this.nose, // nose
             {x: -2, y:-15},
             {x:-10, y:-15}
           ],
@@ -41,6 +54,7 @@ function(_,my,Actor,util) {
         this.attributes.torque : 8000;
 
       this.attributes.angularDamping = 1;
+      this.attributes.linearDamping = 1;
 
       Ship.Super.call(this,this.attributes);
     },
@@ -66,6 +80,10 @@ function(_,my,Actor,util) {
         this.body.ApplyTorque(this.attributes.torque);
       }
 
+      if(keys.space) {
+        this.propelProjectile();
+      }
+
       Ship.Super.prototype.update.call(this);
     },
 
@@ -73,6 +91,18 @@ function(_,my,Actor,util) {
       var d = angle + step;
       if(Math.abs(d) > Math.PI) { d = -(d - (d % Math.PI)); }
       return d;
+    },
+
+    propelProjectile : function() {
+      var projConf = {
+        actorType: 'projectile',
+        position: this.body.GetWorldVector(this.attributes.physics.b2Vec2(this.nose.x,this.nose.y)),
+        angle: this.body.GetAngle(),
+        initialForce: this.body.GetLinearVelocity().Length() * 2,
+      };
+      console.info(projConf);
+      // this.stage.createActor(projConf);
+
     }
 
   });
