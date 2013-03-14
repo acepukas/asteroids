@@ -93,17 +93,26 @@ define([
       return d;
     },
 
-    propelProjectile : function() {
-      var projConf = {
-        actorType: 'projectile',
-        position: this.body.GetWorldVector(this.attributes.physics.b2Vec2(this.nose.x,this.nose.y)),
-        angle: this.body.GetAngle(),
-        initialForce: this.body.GetLinearVelocity().Length() * 2,
-      };
-      console.info(projConf);
-      // this.stage.createActor(projConf);
+    propelProjectile : _.throttle(function() {
 
-    }
+      var localNoseVector = this.attributes.physics.b2Vec2(this.nose.x*2,this.nose.y),
+          worldNoseVector = this.body.GetWorldVector(localNoseVector),
+          bodyPosition = this.body.GetPosition(),
+          scale = this.attributes.physics.getScale(),
+          nosePosition = new Point((bodyPosition.x*scale)+worldNoseVector.x,(bodyPosition.y*scale)+worldNoseVector.y),
+
+          projConf = {
+            actorType: 'projectile',
+            position: nosePosition,
+            radius: 0.5,
+            angle: this.body.GetAngle(),
+            initialForce: this.body.GetLinearVelocity().Length() + 1000
+          };
+
+      console.info(projConf);
+      this.attributes.stage.createActor(projConf);
+
+    },100)
 
   });
 

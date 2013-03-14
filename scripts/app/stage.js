@@ -1,274 +1,269 @@
 /*global define:true, my:true */
 
 define([
-    'myclass',
-    'jquery',
-    'handlebars',
-    'app/canvaswrapper',
-    'app/util',
-    'app/point',
-    'app/actorfactory',
-    'app/physics'
+  'myclass',
+  'jquery',
+  'handlebars',
+  'app/canvaswrapper',
+  'app/util',
+  'app/point',
+  'app/actorfactory',
+  'app/physics'
 ], function(
-    my,
-    $,
-    Handlebars,
-    CanvasWrapper,
-    util,
-    Point,
-    ActorFactory,
-    Physics
+  my,
+  $,
+  Handlebars,
+  CanvasWrapper,
+  util,
+  Point,
+  ActorFactory,
+  Physics
 ){
 
-    var Stage = my.Class((function () {
+  var Stage = my.Class((function () {
 
-        // tracks key status
-        var keys = {
-                right:false,
-                left:false,
-                up:false,
-                down:false,
-                space:false
-            },
+    // tracks key status
+    var keys = {
+            right:false,
+            left:false,
+            up:false,
+            down:false,
+            space:false
+        },
 
-            keymap = {
-                k37:'left',
-                k39:'right',
-                k38:'up',
-                k40:'down',
-                k32:'space'
-            },
+        keymap = {
+            k37:'left',
+            k39:'right',
+            k38:'up',
+            k40:'down',
+            k32:'space'
+        },
 
-            // stores 
-            time = 0,
+        // stores 
+        time = 0,
 
-            // canvas context object
-            canvas = null,
+        // canvas context object
+        canvas = null,
 
-            // Box2D physics object
-            physics,
+        // Box2D physics object
+        physics,
 
-            // stores a list of motion objects
-            actors = [],
+        // stores a list of motion objects
+        actors = [],
 
-            // speed for logic loop which runs 
-            // independently of animation loop
-            gamespeed = Math.round(1000/50),
+        // actors that will be removed outside of a time step
+        scheduledForRemoval = [],
 
-            // info obj for output
-            consoleData = {infoItems:[]},
-            
-            // output template
-            infoPanelTemplate = Handlebars.compile(util.cleanTemplate('#info-panel-template')),
-            
-            // DOM node for information output
-            infoPanel = $('#infoPanel'),
+        // speed for logic loop which runs 
+        // independently of animation loop
+        gamespeed = Math.round(1000/50),
 
-            renderInterval = null,
-
-            gameLoopInterval = null,
-
-            actorFactory = null;
-
-        // set up key event listeners
-        $(document).keydown(function(e) {
-            try {
-                keys[keymap['k'+e.which]]=true;
-            } catch(ex) {}
-        });
+        // info obj for output
+        consoleData = {infoItems:[]},
         
-        $(document).keyup(function(e) {
-            try {
-                keys[keymap['k'+e.which]]=false;
-            } catch(ex) {}
+        // output template
+        infoPanelTemplate = Handlebars.compile(util.cleanTemplate('#info-panel-template')),
+        
+        // DOM node for information output
+        infoPanel = $('#infoPanel'),
+
+        renderInterval = null,
+
+        gameLoopInterval = null,
+
+        actorFactory = null;
+
+    // set up key event listeners
+    $(document).keydown(function(e) {
+      try {
+        keys[keymap['k'+e.which]]=true;
+      } catch(ex) {}
+    });
+    
+    $(document).keyup(function(e) {
+      try {
+        keys[keymap['k'+e.which]]=false;
+      } catch(ex) {}
+    });
+
+    return {
+
+      constructor : function() {
+        if(!(this instanceof Stage)) {
+            return new Stage();
+        }
+
+        physics = new Physics({
+          gravity: {x:0,y:0},
+          scale: 10
+          // , debug: true
         });
+        actorFactory = new ActorFactory({'stage':this});
+        canvas = new CanvasWrapper('#canvas');
+      },
 
-        return {
+      initAnim : function() {
 
-            constructor : function() {
-                if(!(this instanceof Stage)) {
-                    return new Stage();
-                }
+        var gameLoop = util.initTimingLoop(gamespeed,this.update,this);
+        gameLoopInterval = setInterval(gameLoop,0);
 
-                physics = new Physics({
-                  gravity: {x:0,y:0},
-                  scale: 10
-                  // , debug: true
-                });
-                actorFactory = new ActorFactory({'stage':this});
-                canvas = new CanvasWrapper('#canvas');
-            },
+        $('.stopanim').click($.proxy(function(){
+          this.stopAnim();
+        },this));
 
-            initAnim : function() {
+        canvas.initRenderLoop(this.render,this);
 
-                var gameLoop = util.initTimingLoop(gamespeed,this.update,this);
-                gameLoopInterval = setInterval(gameLoop,0);
+      },
 
-                $('.stopanim').click($.proxy(function(){
-                    this.stopAnim();
-                },this));
+      stopAnim : function() {
+        clearInterval(gameLoopInterval);
+      },
 
-                canvas.initRenderLoop(this.render,this);
+      getCanvas : function() {
+        return canvas;
+      },
 
-            },
+      getPhysics : function() {
+        return physics;
+      },
 
-            stopAnim : function() {
-                clearInterval(gameLoopInterval);
-            },
+      getTime : function() {
+        return time;
+      },
 
-            getCanvas : function() {
-                return canvas;
-            },
+      setTime : function (time_arg) {
+        time = time_arg;
+      },
 
-            getPhysics : function() {
-              return physics;
-            },
+      getBounds : function() {
+        return canvas.getBounds();
+      },
 
-            getTime : function() {
-                return time;
-            },
+      getKeys : function() {
+        return keys;
+      },
 
-            setTime : function (time_arg) {
-                time = time_arg;
-            },
+      update : function(updTime) {
+        this.updateActors(updTime);
+        var world = physics.getWorld(),
+            frameRate = 1/60;
 
-            getBounds : function() {
-                return canvas.getBounds();
-            },
+        // run physics simulation
+        world.Step(
+          frameRate,
+          8, // velocity iterations
+          3  // position iterations
+        );
 
-            getKeys : function() {
-                return keys;
-            },
+        world.DrawDebugData();
+        world.ClearForces();
+        this.purgeDeadActors();
+      },
 
-            update : function(updTime) {
-                this.updateActors(updTime);
-                var world = physics.getWorld(),
-                    frameRate = 1/60;
+      render : function(time) {
+        this.setTime(time);
+        canvas.clear();
+        this.renderActors();
+        this.updateInfoPanel();
+      },
 
-                // run physics simulation
-                world.Step(
-                  frameRate,
-                  8, // velocity iterations
-                  3  // position iterations
-                );
+      updateActors : function(updTime) {
+        var i = actors.length;
+        while(i--) {
+          if(!!actors[i]) {
+            actors[i].update(updTime);
+            this.correctPosition(actors[i]);
+          }
+        }
+      },
 
-                world.DrawDebugData();
-                world.ClearForces();
-            },
+      renderActors : function() {
+        var i = actors.length;
+        while(i--) {
+          if(!!actors[i]) {
+            actors[i].render();
+          }
+        }
+      },
 
-            render : function(time) {
-                this.setTime(time);
-                canvas.clear();
-                this.renderActors();
-                // this.updateInfoPanel();
-            },
+      correctPosition : function(actor) { // getionElement as arg
+        var bounds = this.getBounds();
+        if(actor) {
+          var body = actor.body,
+              op = body.GetPosition(),
+              scale = physics.getScale(),
+              x = op.x * scale,
+              y = op.y * scale;
+          
+          if(x > bounds.x2) { body.SetPosition(physics.b2Vec2(bounds.x1/scale,op.y)); }
+          if(y > bounds.y2) { body.SetPosition(physics.b2Vec2(op.x,bounds.y1/scale)); }
+          if(x < bounds.x1) { body.SetPosition(physics.b2Vec2(bounds.x2/scale,op.y)); }
+          if(y < bounds.y1) { body.SetPosition(physics.b2Vec2(op.x,bounds.y2/scale)); }
+        }
+      },
 
-            updateActors : function(updTime) {
-                var i = actors.length;
-                while(i--) {
-                    if(!!actors[i]) {
-                        actors[i].update(updTime);
-                        this.correctPosition(actors[i]);
-                        // this.detectCollisions(actors[i]);
-                    }
-                }
-            },
+      addActor : function(actor) {
+          actors.push(actor);
+      },
 
-            renderActors : function() {
-                var i = actors.length;
-                while(i--) {
-                    if(!!actors[i]) {
-                        actors[i].render();
-                    }
-                }
-            },
+      removeActor : function(actor) {
+        var i = actors.length;
 
-            correctPosition : function(actor) { // getionElement as arg
-                var bounds = this.getBounds();
-                if(actor) {
-                    var body = actor.body,
-                        op = body.GetPosition(),
-                        scale = physics.getScale(),
-                        x = op.x * scale,
-                        y = op.y * scale;
-                    
-                    if(x > bounds.x2) { body.SetPosition(physics.b2Vec2(bounds.x1/scale,op.y)); }
-                    if(y > bounds.y2) { body.SetPosition(physics.b2Vec2(op.x,bounds.y1/scale)); }
-                    if(x < bounds.x1) { body.SetPosition(physics.b2Vec2(bounds.x2/scale,op.y)); }
-                    if(y < bounds.y1) { body.SetPosition(physics.b2Vec2(op.x,bounds.y2/scale)); }
-                }
-            },
+        while(i--) {
+          if(actors[i] === actor) {
+            actors.splice(i,1); 
+          }
+        }
+        
+      },
 
-            detectCollisions : function(ge) {
-                _.each(actors,function(item) {
-                    if(!item || !ge) return;
+      getNumOfActors : function() {
+        return actors.length;
+      },
 
-                    if(item !== ge) {
-                        var distance = util.distanceBetweenPoints(ge.get('position'),item.get('position'));
-                        var selfCollisionRadius = ge.get('collisionRadius');
-                        var itemCollisionRadius = item.get('collisionRadius');
-                        if(distance < (selfCollisionRadius + itemCollisionRadius)){
-                            ge.get('motionElement').collisionDetected(item);
-                        }
-                    }
-                });
-            },
+      getFps : function() {
+        return util.round(1000/(Date.now()-this.getTime()),0);
+      },
 
-            addActor : function(ge) {
-                actors.push(ge);
-            },
+      getCenterPoint : function() {
+        var bounds = this.getBounds(),
+            x = bounds.x2/2,
+            y = bounds.y2/2,
+            point = new Point(x,y);
 
-            removeActor : function(ge) {
-                var i = actors.length;
+        return point;
+      },
 
-                while(i--) {
-                    if(actors[i] === ge) {
-                        actors.splice(i,1); 
-                    }
-                }
-                
-            },
+      createActor : function(config) {
+        this.addActor(actorFactory.createActor(config));
+      },
 
-            getNumOfActors : function() {
-                return actors.length;
-            },
+      setContactListeners : function(callbacks) {
+        physics.setContactListeners(callbacks);
+      },
 
-            getFps : function() {
-                return util.round(1000/(Date.now()-this.getTime()),0);
-            },
+      updateInfoPanel : function() {
+        consoleData.infoItems = [];
+        var numOfActors = actors.length;
+        
+        consoleData.infoItems.push({label:'Actors on Stage',value:numOfActors});
+        // consoleData.infoItems.push({label:'fps',value:this.getFps()});
+        infoPanel.html(infoPanelTemplate(consoleData));
+      },
 
-            getCenterPoint : function() {
-              var bounds = this.getBounds(),
-                  x = bounds.x2/2,
-                  y = bounds.y2/2,
-                  point = new Point(x,y);
+      scheduleActorForRemoval : function(actor) {
+        scheduledForRemoval.push(actor);
+      },
 
-              return point;
-            },
+      purgeDeadActors : function() {
+        var i = 0, l = scheduledForRemoval.length;
+        for(i=0;i<l;i+=1) {
+          scheduledForRemoval[i].destroy();
+        }
+      }
+    };
 
-            createActor : function(config) {
-              this.addActor(actorFactory.createActor(config));
-            },
+  }()));
 
-            setContactListeners : function(callbacks) {
-              physics.setContactListeners(callbacks);
-            },
-
-            updateInfoPanel : function() {
-                consoleData.infoItems = [];
-                var main = actors[0],
-                    el = main.get('className'),
-                    pos = main.get('position'),
-                    heading = main.get('heading');
-                
-                consoleData.infoItems.push({label:el + ' Position',value:pos});
-                // consoleData.infoItems.push({label:el + ' Heading',value:heading});
-                // consoleData.infoItems.push({label:'fps',value:this.getFps()});
-                infoPanel.html(infoPanelTemplate(consoleData));
-            }
-        };
-
-    }()));
-
-    return Stage;
+  return Stage;
 });

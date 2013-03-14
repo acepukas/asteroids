@@ -1,13 +1,28 @@
 /*global define:true, my:true */
 
-define(['myclass','underscore','app/util','app/actor','app/ship','app/asteroid'],
-function(my,_,util,Actor,Ship,Asteroid) {
+define([
+  'myclass',
+  'underscore',
+  'app/util',
+  'app/actor',
+  'app/ship',
+  'app/asteroid',
+  'app/projectile'
+], function(
+  my,
+  _,
+  util,
+  Actor,
+  Ship,
+  Asteroid,
+  Projectile
+) {
 
   var actorTypes = {
     'Actor':Actor
   , 'Ship':Ship
   , 'Asteroid':Asteroid
-  // , 'Projectile':Projectile
+  , 'Projectile':Projectile
   },
 
   ActorFactory = my.Class({

@@ -1,11 +1,38 @@
 /*global define:true */
 
-define(['app/stage','app/actorfactory','app/util'],
-function(Stage,ActorFactory,util) {
+define(['app/stage','app/actorfactory','app/util','app/customevents'],
+function(Stage,ActorFactory,util,CustomEvents) {
 
-  var stage = new Stage();
+  var stage = new Stage(),
+      gameActions;
 
-  return {
+  window.asteroids = {};
+  window.asteroids.events = new CustomEvents();
+
+  // window.asteroids.events.on('collision:ship',function(e,actor) {
+  //   console.info(actor);
+  // });
+  
+  stage.setContactListeners({
+    BeginContact : function(contact) {
+      var a = contact.GetFixtureA().GetBody().GetUserData(),
+          b = contact.GetFixtureB().GetBody().GetUserData(),
+          target;
+          
+      if(a.attributes.actorType === 'ship' || b.attributes.actorType === 'ship') {
+        target = (a.attributes.actorType === 'ship') ? a : b;
+        window.asteroids.events.trigger('collision:ship',target);
+      }
+
+      if((a.attributes.actorType === 'projectile' && b.attributes.actorType === 'asteroid') ||
+        (a.attributes.actorType === 'asteroid' && b.attributes.actorType === 'projectile')) {
+        stage.scheduleActorForRemoval(a);
+        stage.scheduleActorForRemoval(b);
+      }
+    }
+  });
+
+  gameActions = {
     start : function(){
       this.addShip();
 
@@ -14,17 +41,6 @@ function(Stage,ActorFactory,util) {
       for(i=0;i<l;i+=1) {
         this.addAsteroid();
       }
-
-      stage.setContactListeners({
-        BeginContact : function(contact) {
-          var a = contact.GetFixtureA().GetBody().GetUserData(),
-              b = contact.GetFixtureB().GetBody().GetUserData();
-              
-          if(a === 'ship' || b === 'ship') {
-            console.info('ship collided');
-          }
-        }
-      });
 
       stage.initAnim();
     },
@@ -54,6 +70,12 @@ function(Stage,ActorFactory,util) {
         angle: 0,
         radius: 4
       });
+    }
+  };
+
+  return {
+    start : function() {
+      gameActions.start();
     }
   };
 

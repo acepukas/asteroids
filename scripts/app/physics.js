@@ -90,6 +90,7 @@ function(my,util) {
           fixDefShape,
           bodyDef,
           body,
+          fixture,
           position,
           bodyType,
           bodyTypes = {
@@ -132,15 +133,13 @@ function(my,util) {
       position = config.position || {x:0,y:0};
       bodyDef.position.x = (position.x||0)/this.scale;
       bodyDef.position.y = (position.y||0)/this.scale;
-      bodyDef.angle = util.tr(config.angle || 0);
+      bodyDef.angle = config.angle || 0;
       bodyDef.angularDamping = config.angularDamping;
 
       body = this.world.CreateBody(bodyDef);
-      body.CreateFixture(fixDef);
+      fixture = body.CreateFixture(fixDef);
 
-      body.SetUserData(config.userData);
-
-      return body;
+      return {body:body,fixture:fixture};
     },
 
     b2Vec2 : function(x,y) {

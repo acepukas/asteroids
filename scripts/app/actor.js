@@ -21,6 +21,8 @@ function(my,util,_) {
 
       this.attributes.state = 'default';
 
+      console.info(this.attributes.angle);
+
       // create Box2D body object
       var bodyConfig = {
         shapeType: 'circle',
@@ -29,11 +31,15 @@ function(my,util,_) {
         angle: this.attributes.angle,
         radius: this.attributes.radius,
         angularDamping: this.attributes.angularDamping || 0,
-        linearDamping: this.attributes.linearDamping || 0,
-        userData: this.attributes.actorType
+        linearDamping: this.attributes.linearDamping || 0
       };
 
-      this.body = this.attributes.physics.createBody(bodyConfig);
+      var physElements = this.attributes.physics.createBody(bodyConfig);
+
+      this.body = physElements.body;
+      this.fixture = physElements.fixture;
+
+      this.body.SetUserData(this);
 
       if(!!this.attributes.initialForce) {
         var localVector = this.attributes.physics.b2Vec2(this.attributes.initialForce,0),
@@ -85,6 +91,12 @@ function(my,util,_) {
         direction: this.attributes.angle,
         position: this.attributes.position
       },this.attributes.states[this.attributes.state]));
+    },
+
+    destroy : function() {
+      this.body.DestroyFixture(this.fixture);
+      this.attributes.physics.getWorld().DestroyBody(this.body);
+      this.attributes.stage.removeActor(this);
     }
 
   });
